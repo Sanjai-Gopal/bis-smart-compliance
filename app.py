@@ -1,29 +1,47 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
 import nltk
 
-nltk.download('punkt')
+nltk.download("punkt")
 
-# ---------------- CONFIG ----------------
+# ---------------- PAGE CONFIG ----------------
 st.set_page_config(
-    page_title="BIS Smart Compliance System",
+    page_title="BIS Smart Consumer Protection Platform",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ---------------- LOAD DATA ----------------
-rules_df = pd.read_csv("bis_rules.csv")
+# ---------------- EMBEDDED BIS DATA ----------------
+bis_data = [
+    {"claim": "shockproof", "bis_standard": "IS 13252", "status": "Needs Verification", "explanation": "Requires electrical safety testing"},
+    {"claim": "waterproof", "bis_standard": "IS 60529", "status": "Needs Verification", "explanation": "IP rating required"},
+    {"claim": "fire resistant", "bis_standard": "IS 1646", "status": "Regulated", "explanation": "Fire resistance standard"},
+    {"claim": "energy efficient", "bis_standard": "IS 14800", "status": "Needs Verification", "explanation": "Star rating proof required"},
+    {"claim": "eco friendly", "bis_standard": "N/A", "status": "Not Defined", "explanation": "Marketing claim not defined by BIS"},
+    {"claim": "child safe", "bis_standard": "IS 9873", "status": "Regulated", "explanation": "Toy safety standard"}
+]
+
+rules_df = pd.DataFrame(bis_data)
 
 # ---------------- HEADER ----------------
-st.markdown("<h1 style='text-align:center;'>🏛️ BIS Smart Product Compliance System</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center;'>AI-powered product claim verification, risk analysis & consumer support</p>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;'>🏛️ BIS Smart Consumer Protection Platform</h1>", unsafe_allow_html=True)
+st.markdown(
+    "<p style='text-align:center;'>AI-powered safety verdict, trust score & official BIS complaint support</p>",
+    unsafe_allow_html=True
+)
 st.markdown("---")
 
 # ---------------- SIDEBAR ----------------
 st.sidebar.title("🔍 Navigation")
 section = st.sidebar.radio(
-    "Go to:",
-    ["Compliance Checker", "Quick Test Lab", "Complaint Centre", "Consumer Awareness", "About Project"]
+    "Select Section",
+    [
+        "Compliance Checker",
+        "Quick Test Lab",
+        "Complaint Centre",
+        "Consumer Awareness",
+        "About Project"
+    ]
 )
 
 # =====================================================
@@ -31,37 +49,33 @@ section = st.sidebar.radio(
 # =====================================================
 if section == "Compliance Checker":
 
-    st.subheader("📝 Product Claim Compliance Checker")
+    st.subheader("📝 Product Compliance Checker")
 
     product_text = st.text_area(
-        "Enter product description:",
-        placeholder="Example: This charger is shockproof, waterproof and energy efficient."
+        "Enter product description",
+        placeholder="Example: This appliance is shockproof, waterproof and energy efficient."
     )
 
-    if st.button("Check Compliance"):
+    if st.button("Analyze Product"):
         if product_text.strip() == "":
             st.warning("Please enter a product description.")
         else:
-            found_claims = []
+            detected = []
             for _, row in rules_df.iterrows():
-                if row['claim'] in product_text.lower():
-                    found_claims.append(row)
+                if row["claim"] in product_text.lower():
+                    detected.append(row)
 
-            if not found_claims:
+            if not detected:
                 st.info("No BIS-related claims detected.")
             else:
-                result_df = pd.DataFrame(found_claims)
+                result_df = pd.DataFrame(detected)
 
-                st.success("✅ Compliance Analysis Result")
-                st.table(result_df[['claim', 'bis_standard', 'status', 'explanation']])
+                st.success("✅ Detected Claims & BIS Status")
+                st.table(result_df[["claim", "bis_standard", "status", "explanation"]])
 
-                # -------- Claim Summary --------
-                st.markdown("### 📌 Claim Summary")
-                st.write(f"Total Claims Detected: **{len(result_df)}**")
-
-                # -------- Score Calculation --------
+                # ---------------- TRUST SCORE ----------------
                 score = 0
-                for status in result_df['status']:
+                for status in result_df["status"]:
                     if status == "Regulated":
                         score += 30
                     elif status == "Needs Verification":
@@ -70,11 +84,13 @@ if section == "Compliance Checker":
                         score += 5
                 score = min(score, 100)
 
-                st.markdown("### 📊 Compliance Score")
-                st.progress(score / 100)
-                st.write(f"**Score:** {score} / 100")
+                undefined_claims = len(result_df[result_df["status"] == "Not Defined"])
 
-                # -------- Risk Level --------
+                st.markdown("### 🤝 Product Trust Score")
+                st.progress(score / 100)
+                st.write(f"**Trust Score:** {score} / 100")
+
+                # ---------------- RISK LEVEL ----------------
                 if score >= 70:
                     risk = "🟢 LOW RISK"
                 elif score >= 40:
@@ -85,22 +101,61 @@ if section == "Compliance Checker":
                 st.markdown("### 🚦 Risk Level")
                 st.write(risk)
 
-                if "HIGH" in risk:
-                    st.error("⚠️ High risk product. BIS certification strongly recommended.")
-                elif "MEDIUM" in risk:
-                    st.warning("⚠️ Medium risk. Verification documents required.")
-                else:
-                    st.success("✅ Product appears largely compliant.")
+                # ---------------- PRODUCT RISK LABEL ----------------
+                st.markdown("### 🏷️ Product Risk Label")
+                st.write("Safety Risk :", "🔴 HIGH" if "HIGH" in risk else "🟡 MEDIUM" if "MEDIUM" in risk else "🟢 LOW")
+                st.write("Misleading Claim Risk :", "🟡 MEDIUM" if undefined_claims > 0 else "🟢 LOW")
+                st.write("Compliance Risk :", "🔴 HIGH" if score < 40 else "🟡 MEDIUM" if score < 70 else "🟢 LOW")
 
-                with st.expander("ℹ️ How to interpret results"):
+                # ---------------- AI SAFETY VERDICT ----------------
+                st.markdown("### 🧠 AI Safety Verdict")
+
+                if "HIGH" in risk:
+                    verdict = "🔴 DO NOT BUY"
+                    steps = [
+                        "Avoid purchasing this product",
+                        "Check for fake BIS markings",
+                        "Report the product to BIS",
+                        "Choose a BIS-certified alternative"
+                    ]
+                elif "MEDIUM" in risk or undefined_claims > 0:
+                    verdict = "🟡 BUY WITH CAUTION"
+                    steps = [
+                        "Ask seller for BIS certification",
+                        "Verify safety and efficiency documents",
+                        "Purchase only from trusted sellers"
+                    ]
+                else:
+                    verdict = "🟢 SAFE TO BUY"
+                    steps = [
+                        "Check BIS mark on packaging",
+                        "Keep invoice and warranty card",
+                        "Follow safety instructions"
+                    ]
+
+                st.subheader(verdict)
+
+                st.markdown("### 🧭 Customer Action Roadmap")
+                for i, step in enumerate(steps, 1):
+                    st.write(f"{i}. {step}")
+
+                # ---------------- WARNINGS ----------------
+                if undefined_claims > 0:
+                    st.warning("⚠️ This product uses marketing claims not officially defined by BIS.")
+                if "HIGH" in risk:
+                    st.error("🚨 High safety risk detected. Consumer caution advised.")
+
+                with st.expander("🤖 Why did the system give this verdict?"):
                     st.write("""
-                    - **Regulated**: Covered under BIS standards  
-                    - **Needs Verification**: Lab testing / certification needed  
-                    - **Not Defined**: Marketing claim not regulated by BIS
+                    The verdict is based on:
+                    • Number of regulated claims  
+                    • Verification requirements  
+                    • Presence of misleading marketing terms  
+                    • Overall trust score
                     """)
 
 # =====================================================
-# 🧪 SECTION 2: QUICK TEST LAB (FOR JUDGES)
+# 🧪 SECTION 2: QUICK TEST LAB
 # =====================================================
 elif section == "Quick Test Lab":
 
@@ -109,42 +164,44 @@ elif section == "Quick Test Lab":
     col1, col2, col3 = st.columns(3)
 
     if col1.button("Electrical Appliance"):
-        st.write("This appliance is shockproof, waterproof and energy efficient.")
+        st.code("This appliance is shockproof, waterproof and energy efficient.")
 
     if col2.button("Misleading Product"):
-        st.write("This product claims to be eco friendly and fire resistant without certification.")
+        st.code("This product claims to be eco friendly and fire resistant without certification.")
 
     if col3.button("Child Safety Product"):
-        st.write("This toy is child safe and shockproof.")
-
-    st.info("Judges can copy any test case and verify using the Compliance Checker.")
+        st.code("This toy is child safe and shockproof.")
 
 # =====================================================
-# 📢 SECTION 3: COMPLAINT CENTRE (VERY IMPRESSIVE)
+# 📢 SECTION 3: COMPLAINT CENTRE
 # =====================================================
 elif section == "Complaint Centre":
 
     st.subheader("📢 Consumer Complaint Centre")
 
-    st.write("Report unsafe or misleading products to support BIS enforcement.")
+    st.write("Report unsafe or misleading products.")
 
     name = st.text_input("Your Name")
     product = st.text_input("Product Name")
-    issue = st.selectbox("Issue Type", [
-        "Misleading Claims",
-        "Safety Concern",
-        "Fake BIS Mark",
-        "Poor Quality",
-        "Other"
-    ])
+    issue = st.selectbox(
+        "Issue Type",
+        ["Misleading Claims", "Safety Concern", "Fake BIS Mark", "Poor Quality", "Other"]
+    )
     description = st.text_area("Describe the issue")
 
-    if st.button("Submit Complaint"):
+    if st.button("Submit Local Report"):
         if name and product and description:
-            st.success("✅ Complaint submitted successfully (simulation).")
-            st.info("This data can help BIS identify high-risk products.")
+            st.success("✅ Complaint recorded (demo system).")
         else:
             st.warning("Please fill all required fields.")
+
+    st.markdown("### 🏛️ Official BIS Complaint Portal")
+    st.write("For official action, file a complaint directly with BIS.")
+
+    st.markdown(
+        "[🔗 Click here to file complaint on official BIS portal](https://consumerbis.gov.in)",
+        unsafe_allow_html=True
+    )
 
 # =====================================================
 # 📘 SECTION 4: CONSUMER AWARENESS
@@ -154,19 +211,19 @@ elif section == "Consumer Awareness":
     st.subheader("📘 Consumer Awareness & Safety")
 
     st.markdown("""
-    ### Why BIS Compliance Matters
+    **Why BIS Compliance Matters**
     - Prevents unsafe products  
-    - Ensures quality standards  
-    - Protects consumers  
+    - Protects consumer rights  
+    - Ensures minimum quality standards  
 
-    ### Common Misleading Claims
+    **Common Misleading Claims**
     - 100% Eco Friendly  
     - Ultra Safe  
-    - Shockproof without certification  
+    - Certified without BIS mark  
 
-    ### What You Can Do
-    - Check BIS mark  
-    - Verify claims  
+    **What Consumers Should Do**
+    - Always check BIS certification  
+    - Verify seller documentation  
     - Report suspicious products
     """)
 
@@ -178,21 +235,23 @@ elif section == "About Project":
     st.subheader("ℹ️ About This Project")
 
     st.write("""
-    **Project Title:** BIS Smart Product Compliance System  
+    **Project Name:** BIS Smart Consumer Protection Platform  
     **Domain:** Artificial Intelligence & Data Science  
     **Type:** Software-based Decision Support System  
 
-    **Key Features:**
-    - NLP-based claim detection  
-    - Compliance score & risk analysis  
-    - Judge testing lab  
-    - Consumer complaint centre  
-    - Awareness & education module  
+    **Unique Highlights**
+    - AI-based safety verdict (Buy / Caution / Do Not Buy)
+    - Trust score and product risk labeling
+    - Consumer action roadmap
+    - Official BIS complaint redirection
+    - Explainable AI decisions
 
-    **Objective:**  
-    To support BIS goals by improving transparency, safety, and consumer awareness.
+    **Goal:**  
+    To empower consumers and support BIS objectives through technology.
     """)
 
 # ---------------- FOOTER ----------------
 st.markdown("---")
-st.caption("⚖️ Disclaimer: This system is for educational and decision-support purposes only and does not replace official BIS certification.")
+st.caption(
+    "⚖️ Disclaimer: This system is for educational and decision-support purposes only and does not replace official BIS certification."
+)
