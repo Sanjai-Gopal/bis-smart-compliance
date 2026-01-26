@@ -1,52 +1,50 @@
 import streamlit as st
 import pandas as pd
-import nltk
-
-nltk.download("punkt")
 
 # ================= PAGE CONFIG =================
 st.set_page_config(
-    page_title="BIS Smart Consumer Protection Platform",
+    page_title="BIS Consumer Safety Portal",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# ================= DATA =================
-bis_data = [
-    {"claim": "shockproof", "bis_standard": "IS 13252", "status": "Needs Verification", "explanation": "Electrical safety testing required"},
-    {"claim": "waterproof", "bis_standard": "IS 60529", "status": "Needs Verification", "explanation": "IP rating verification required"},
-    {"claim": "fire resistant", "bis_standard": "IS 1646", "status": "Regulated", "explanation": "Fire resistance standard"},
-    {"claim": "energy efficient", "bis_standard": "IS 14800", "status": "Needs Verification", "explanation": "BEE star rating required"},
-    {"claim": "eco friendly", "bis_standard": "N/A", "status": "Not Defined", "explanation": "Marketing claim not defined by BIS"},
-    {"claim": "child safe", "bis_standard": "IS 9873", "status": "Regulated", "explanation": "Toy safety standard"}
+# ================= SAMPLE BIS BRAND DATABASE (DEMO) =================
+brand_data = [
+    {"brand": "Philips", "model": "HL7756", "category": "Electrical Appliance", "status": "Verified"},
+    {"brand": "Havells", "model": "Adonia-R", "category": "Electrical Appliance", "status": "Verified"},
+    {"brand": "Syska", "model": "SSK-Power", "category": "Electrical Appliance", "status": "Under Verification"},
+    {"brand": "LocalBrandX", "model": "EcoPlus-200", "category": "Electrical Appliance", "status": "Not Verified"},
+    {"brand": "UnknownCo", "model": "FireSafe-Z", "category": "Home Appliance", "status": "Disapproved"}
 ]
-rules_df = pd.DataFrame(bis_data)
+brand_df = pd.DataFrame(brand_data)
 
 # ================= SIDEBAR =================
-st.sidebar.markdown("## 🏛️ BIS Smart Platform")
-st.sidebar.markdown("Consumer Safety • Compliance • Awareness")
+st.sidebar.markdown("## 🏛️ BIS Consumer Safety Portal")
+st.sidebar.markdown("Protect • Verify • Report")
 st.sidebar.markdown("---")
 
 menu = st.sidebar.radio(
     "Navigate",
     [
-        "📊 Compliance Dashboard",
-        "🧪 Product Testing Lab",
-        "📢 Official Complaint Support",
-        "📘 Consumer Awareness",
-        "ℹ️ About Project"
+        "🏠 Home",
+        "🔍 Product Safety Check",
+        "🏷️ Brand & Model Lookup",
+        "🤖 Consumer AI Assistant",
+        "📘 Consumer Guidance",
+        "📢 Complaint & Help Desk",
+        "ℹ️ About"
     ]
 )
 
 st.sidebar.markdown("---")
-st.sidebar.caption("Public demo • Educational use")
+st.sidebar.caption("Public awareness • Demo platform")
 
 # ================= HEADER =================
 st.markdown("""
-<div style="background:#020617;padding:28px;border-radius:14px;">
-<h1 style="color:white;text-align:center;">BIS Smart Consumer Protection Platform</h1>
-<p style="color:#cbd5f5;text-align:center;font-size:16px;">
-AI-powered product safety verdict, trust scoring & official BIS complaint support
+<div style="background:#020617;padding:30px;border-radius:14px;">
+<h1 style="color:white;text-align:center;">BIS Consumer Safety Portal</h1>
+<p style="color:#cbd5f5;text-align:center;">
+A public-facing platform for consumer safety awareness & compliance guidance
 </p>
 </div>
 """, unsafe_allow_html=True)
@@ -54,173 +52,146 @@ AI-powered product safety verdict, trust scoring & official BIS complaint suppor
 st.markdown("")
 
 # =====================================================
-# 📊 COMPLIANCE DASHBOARD
+# 🏠 HOME
 # =====================================================
-if menu == "📊 Compliance Dashboard":
+if menu == "🏠 Home":
+    st.markdown("## 👋 Welcome")
 
-    st.markdown("## 🔍 Product Compliance Analysis")
+    st.write("""
+    This platform helps consumers understand **product safety claims,
+    brand reliability, and official BIS procedures**.
 
-    product_text = st.text_area(
-        "Enter product description",
-        height=120,
-        placeholder="Example: This appliance is shockproof, waterproof and energy efficient."
-    )
+    It does **not certify products**, but guides users toward
+    **informed decisions and official channels**.
+    """)
 
-    if st.button("🔎 Analyze Product", use_container_width=True):
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Sample Brands Listed", len(brand_df))
+    col2.metric("Verification Categories", "4")
+    col3.metric("Official BIS Link", "Available")
 
-        detected = []
-        for _, row in rules_df.iterrows():
-            if row["claim"] in product_text.lower():
-                detected.append(row)
+# =====================================================
+# 🔍 PRODUCT SAFETY CHECK
+# =====================================================
+elif menu == "🔍 Product Safety Check":
+    st.markdown("## 🔍 Product Safety Check")
+    st.info("Enter claims as shown on packaging or advertisements.")
 
-        if not detected:
-            st.info("No BIS-related claims detected.")
+    text = st.text_area("Product Description")
+
+    if st.button("Analyze"):
+        if "eco" in text.lower():
+            st.warning("⚠️ 'Eco-friendly' is not officially defined under BIS.")
+        if "shockproof" in text.lower():
+            st.success("✔ Electrical safety claims require IS 13252 testing.")
+        if text.strip() == "":
+            st.info("No claims detected.")
+
+# =====================================================
+# 🏷️ BRAND & MODEL LOOKUP
+# =====================================================
+elif menu == "🏷️ Brand & Model Lookup":
+    st.markdown("## 🏷️ Brand & Model Verification Lookup")
+
+    brand = st.text_input("Enter Brand Name")
+    model = st.text_input("Enter Model Number (optional)")
+
+    if st.button("Search Brand"):
+
+        results = brand_df[brand_df["brand"].str.lower() == brand.lower()]
+
+        if model:
+            results = results[results["model"].str.lower() == model.lower()]
+
+        if results.empty:
+            st.error("❌ Brand / Model not found in BIS demo registry.")
+            st.caption("This does not mean the product is unsafe. Always verify through official BIS sources.")
         else:
-            df = pd.DataFrame(detected)
+            st.dataframe(results, use_container_width=True)
 
-            # ---------- KPI CARDS ----------
-            total_claims = len(df)
-            regulated = len(df[df["status"] == "Regulated"])
-            undefined = len(df[df["status"] == "Not Defined"])
-
-            col1, col2, col3 = st.columns(3)
-            col1.metric("Claims Detected", total_claims)
-            col2.metric("Regulated Claims", regulated)
-            col3.metric("Undefined Claims", undefined)
-
-            st.markdown("### 📋 Compliance Details")
-            st.dataframe(df, use_container_width=True)
-
-            # ---------- TRUST SCORE ----------
-            score = 0
-            for s in df["status"]:
-                score += 30 if s == "Regulated" else 15 if s == "Needs Verification" else 5
-            score = min(score, 100)
-
-            st.markdown("### 🤝 Trust Score")
-            st.progress(score / 100)
-            st.write(f"**{score} / 100**")
-
-            # ---------- VERDICT ----------
-            if score >= 70:
-                verdict = "🟢 SAFE TO BUY"
-                color = "#022c22"
-            elif score >= 40:
-                verdict = "🟡 BUY WITH CAUTION"
-                color = "#3b2f00"
-            else:
-                verdict = "🔴 DO NOT BUY"
-                color = "#450a0a"
-
-            st.markdown(f"""
-            <div style="background:{color};padding:20px;border-radius:10px;">
-            <h2 style="text-align:center;color:white;">{verdict}</h2>
-            </div>
-            """, unsafe_allow_html=True)
-
-            with st.expander("🤖 Why this verdict?"):
-                st.write("""
-                The verdict is generated using:
-                • Number of regulated BIS claims  
-                • Claims requiring verification  
-                • Presence of undefined marketing terms  
-                • Overall compliance confidence score
-                """)
+    st.caption("⚠️ Note: This is a demo registry. Real implementation requires official BIS datasets.")
 
 # =====================================================
-# 🧪 PRODUCT TESTING LAB
+# 🤖 CONSUMER AI ASSISTANT
 # =====================================================
-elif menu == "🧪 Product Testing Lab":
+elif menu == "🤖 Consumer AI Assistant":
+    st.markdown("## 🤖 Consumer AI Assistant")
+    st.write("Ask safety or compliance related questions.")
 
-    st.markdown("## 🧪 Product Testing Lab (Judge Demo)")
+    question = st.text_input("Ask a question")
 
-    example = st.radio(
-        "Choose a test case",
-        [
-            "Electrical Appliance",
-            "Misleading Product",
-            "Child Safety Product"
-        ]
-    )
+    if st.button("Get Answer"):
+        q = question.lower()
 
-    samples = {
-        "Electrical Appliance": "This appliance is shockproof, waterproof and energy efficient.",
-        "Misleading Product": "This product claims to be eco friendly and fire resistant without certification.",
-        "Child Safety Product": "This toy is child safe and shockproof."
-    }
-
-    st.text_area("Test Input", samples[example], height=100)
-    st.info("Judges can copy this text and test it in Compliance Dashboard.")
+        if "bis" in q:
+            st.info("BIS is the Bureau of Indian Standards, responsible for product standardization and certification.")
+        elif "complaint" in q:
+            st.info("Consumers can file complaints through the official BIS online complaint registration portal.")
+        elif "eco" in q:
+            st.info("Eco-friendly claims are often marketing terms and not formally defined under BIS.")
+        elif "safe" in q:
+            st.info("Safety depends on certification, testing, and compliance with BIS standards.")
+        elif question.strip() == "":
+            st.warning("Please enter a question.")
+        else:
+            st.info("This assistant provides general guidance. For official decisions, contact BIS.")
 
 # =====================================================
-# 📢 OFFICIAL COMPLAINT SUPPORT
+# 📘 CONSUMER GUIDANCE
 # =====================================================
-elif menu == "📢 Official Complaint Support":
+elif menu == "📘 Consumer Guidance":
+    st.markdown("## 📘 Consumer Guidance")
 
-    st.markdown("## 📢 Official BIS Complaint Support")
+    st.markdown("""
+    ### Before Buying
+    • Check BIS mark  
+    • Verify brand authenticity  
+    • Avoid exaggerated claims  
+
+    ### After Buying
+    • Keep invoice  
+    • Register warranty  
+    • Report unsafe products  
+
+    ### Warning Signs
+    • Fake BIS logo  
+    • No manufacturer details  
+    • Too-good-to-be-true claims
+    """)
+
+# =====================================================
+# 📢 COMPLAINT & HELP DESK
+# =====================================================
+elif menu == "📢 Complaint & Help Desk":
+    st.markdown("## 📢 Complaint & Help Desk")
 
     st.markdown("""
     <div style="background:#020617;padding:22px;border-radius:12px;">
-    <h3 style="color:white;">🏛️ Government of India – BIS Complaint Registration</h3>
+    <h3 style="color:white;">🏛️ Official BIS Complaint Registration</h3>
     <p style="color:#cbd5f5;">
-    If a product is unsafe, misleading, or falsely claims BIS certification,
-    consumers must file complaints through the official BIS portal.
+    Register product-related complaints through the official BIS portal.
     </p>
     <a href="https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/?lang=en"
        target="_blank"
        style="font-size:17px;font-weight:bold;color:#38bdf8;">
-       🔗 Go to Official BIS Online Complaint Registration
+       🔗 Go to BIS Online Complaint Registration
     </a>
     </div>
     """, unsafe_allow_html=True)
 
 # =====================================================
-# 📘 CONSUMER AWARENESS
+# ℹ️ ABOUT
 # =====================================================
-elif menu == "📘 Consumer Awareness":
-
-    st.markdown("## 📘 Consumer Awareness & Safety")
-
-    st.markdown("""
-    ### Why BIS Compliance Matters
-    • Protects consumers from unsafe products  
-    • Prevents misleading advertisements  
-    • Ensures minimum quality standards  
-
-    ### Common Misleading Claims
-    • “100% Eco Friendly”  
-    • “Ultra Safe”  
-    • “Certified” without BIS mark  
-
-    ### Consumer Responsibility
-    • Check BIS certification  
-    • Verify seller documents  
-    • Report suspicious products
-    """)
-
-# =====================================================
-# ℹ️ ABOUT PROJECT
-# =====================================================
-elif menu == "ℹ️ About Project":
-
-    st.markdown("## ℹ️ About This Project")
+elif menu == "ℹ️ About":
+    st.markdown("## ℹ️ About This Platform")
 
     st.write("""
-    **Project Name:** BIS Smart Consumer Protection Platform  
-    **Domain:** Artificial Intelligence & Data Science  
-    **Type:** Public-facing compliance decision system  
+    This is a **consumer awareness and decision-support platform**
+    built to demonstrate how AI can assist public safety systems.
 
-    **Key Strengths**
-    • AI-generated safety verdict  
-    • Trust scoring mechanism  
-    • Official BIS complaint redirection  
-    • Judge testing lab  
-    • Consumer awareness integration  
-
-    **Objective:**  
-    To digitally support BIS goals and empower Indian consumers.
+    It does not replace BIS authority or certification.
     """)
 
 # ================= FOOTER =================
 st.markdown("---")
-st.caption("⚖️ Disclaimer: This system is for educational and decision-support purposes only and does not replace official BIS certification.")
+st.caption("⚖️ Disclaimer: Educational & awareness platform only. Not an official BIS system.")
