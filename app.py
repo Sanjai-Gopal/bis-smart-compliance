@@ -291,113 +291,105 @@ elif st.session_state.page == "assistant":
     st.header("🤖 Consumer Safety Assistant")
 
     q = st.text_input(
-        "Ask your question (example: Should I buy this charger?, Is eco friendly safe?, Fake BIS?)"
+        "Ask your question (example: Should I buy this charger?, Is BIS compulsory?, Fake BIS mark?)"
     )
 
     if st.button("Get Answer"):
-        if not q.strip():
-            st.warning("Please type your question.")
+        if not q or not q.strip():
+            st.warning("Please type a question.")
         else:
-            ql = q.lower()
+            ql = q.lower().strip()
 
-            # ============ INTENT DETECTION ============
-            intents = {
-                "bis": any(k in ql for k in ["bis", "certification", "certified"]),
-                "safety": any(k in ql for k in ["safe", "unsafe", "danger", "risk"]),
-                "buy": any(k in ql for k in ["buy", "purchase", "use"]),
-                "fake": any(k in ql for k in ["fake", "false", "duplicate"]),
-                "complain": any(k in ql for k in ["complain", "report", "complaint"]),
-                "brand": any(k in ql for k in ["brand", "company", "manufacturer"]),
-                "eco": any(k in ql for k in ["eco", "green", "environment"]),
-                "electric": any(k in ql for k in ["charger", "electric", "heater", "power"]),
-                "cheap": any(k in ql for k in ["cheap", "low price", "very low"]),
-            }
+            # ---------- BASIC SIGNAL CHECK ----------
+            has_bis = "bis" in ql or "certif" in ql
+            has_buy = "buy" in ql or "purchase" in ql or "use" in ql
+            has_safe = "safe" in ql or "danger" in ql or "risk" in ql
+            has_fake = "fake" in ql or "duplicate" in ql
+            has_complain = "complain" in ql or "report" in ql
+            has_eco = "eco" in ql or "green" in ql
+            has_electric = "charger" in ql or "electric" in ql or "heater" in ql
+            has_brand = "brand" in ql or "company" in ql
+            has_cheap = "cheap" in ql or "low price" in ql
 
-            # ============ RESPONSE LOGIC ============
-            # Case 1: Buying + Safety (most common)
-            if intents["buy"] and intents["safety"]:
+            # ---------- SMART DECISION ENGINE ----------
+
+            # 1️⃣ Very risky situations
+            if has_fake:
                 st.markdown(
-                    "**Final Answer:** ⚠️ Decide after verification\n\n"
-                    "**Reasoning:** Product safety depends on BIS certification, "
-                    "brand reliability, and realistic claims.\n\n"
-                    "**What BIS expects:** Mandatory BIS standards for regulated products.\n\n"
-                    "**What you should do:**\n"
-                    "• Check BIS mark and license number\n"
-                    "• Avoid unrealistic claims\n"
-                    "• Buy from trusted sellers"
-                )
-
-            # Case 2: Eco-friendly confusion
-            elif intents["eco"]:
-                st.markdown(
-                    "**Final Answer:** ⚠️ Marketing term only\n\n"
-                    "**Reasoning:** BIS does not certify products as eco-friendly.\n\n"
-                    "**What BIS says:** Only safety and quality standards are regulated.\n\n"
-                    "**What you should do:** Focus on BIS safety certification, not eco claims."
-                )
-
-            # Case 3: Electrical products
-            elif intents["electric"]:
-                st.markdown(
-                    "**Final Answer:** ⚠️ Needs BIS safety compliance\n\n"
-                    "**Reasoning:** Electrical products can cause shock or fire.\n\n"
-                    "**What BIS says:** IS 13252 is required for many electrical items.\n\n"
-                    "**What you should do:** Avoid products without BIS mark."
-                )
-
-            # Case 4: Fake BIS
-            elif intents["fake"]:
-                st.markdown(
-                    "**Final Answer:** ❌ Do not use\n\n"
-                    "**Reasoning:** Fake BIS marks hide safety risks.\n\n"
-                    "**What BIS says:** Fake certification is illegal.\n\n"
-                    "**What you should do:** Do not buy and report to BIS."
-                )
-
-            # Case 5: Complaint
-            elif intents["complain"]:
-                st.markdown(
-                    "**Final Answer:** 📢 File an official complaint\n\n"
-                    "**Reasoning:** BIS investigates unsafe or misleading products.\n\n"
-                    "**What you should do:** Submit details at:\n"
+                    "**Decision:** ❌ Not recommended\n\n"
+                    "**Reason:** Fake or duplicate BIS marks indicate serious safety risk.\n\n"
+                    "**Action:** Do not buy or use the product. Report it on the official BIS portal:\n"
                     "https://consumerapp.bis.gov.in"
                 )
 
-            # Case 6: Brand trust
-            elif intents["brand"]:
+            # 2️⃣ Buying electrical product
+            elif has_buy and has_electric:
                 st.markdown(
-                    "**Final Answer:** ⚠️ Brand name alone is not enough\n\n"
-                    "**Reasoning:** BIS certification is product- and model-specific.\n\n"
-                    "**What you should do:** Verify the exact model and BIS mark."
+                    "**Decision:** ⚠️ Use only after verification\n\n"
+                    "**Reason:** Electrical products can cause shock or fire if not certified.\n\n"
+                    "**What BIS requires:** IS 13252 safety compliance.\n\n"
+                    "**Action:** Check BIS mark and license number before buying."
                 )
 
-            # Case 7: Cheap products
-            elif intents["cheap"]:
+            # 3️⃣ Eco-friendly confusion
+            elif has_eco:
                 st.markdown(
-                    "**Final Answer:** ⚠️ Higher risk\n\n"
-                    "**Reasoning:** Extremely low prices often compromise safety.\n\n"
-                    "**What you should do:** Check BIS certification carefully."
+                    "**Decision:** ⚠️ Claim needs caution\n\n"
+                    "**Reason:** Eco-friendly is a marketing term and not defined by BIS.\n\n"
+                    "**Action:** Focus on safety certification, not eco claims."
                 )
 
-            # Case 8: BIS explanation
-            elif intents["bis"]:
+            # 4️⃣ Brand trust only
+            elif has_brand and not has_bis:
                 st.markdown(
-                    "**Final Answer:** ℹ️ BIS ensures minimum safety standards\n\n"
-                    "**Explanation:** BIS defines quality and safety requirements for "
-                    "certain products in India.\n\n"
-                    "**What you should do:** Look for BIS mark and license number."
+                    "**Decision:** ⚠️ Incomplete information\n\n"
+                    "**Reason:** Brand name alone does not guarantee safety.\n\n"
+                    "**Action:** Verify BIS mark for the specific product model."
                 )
 
-            # Fallback (always safe)
+            # 5️⃣ General safety doubt
+            elif has_safe:
+                st.markdown(
+                    "**Decision:** ⚠️ Depends on certification\n\n"
+                    "**Reason:** Product safety depends on BIS compliance and realistic claims.\n\n"
+                    "**Action:** Check BIS mark and avoid unrealistic promises."
+                )
+
+            # 6️⃣ Complaint guidance
+            elif has_complain:
+                st.markdown(
+                    "**Action:** 📢 File a complaint\n\n"
+                    "**When:** Fake BIS mark, unsafe product behavior, misleading claims.\n\n"
+                    "**Official portal:** https://consumerapp.bis.gov.in"
+                )
+
+            # 7️⃣ BIS explanation
+            elif has_bis:
+                st.markdown(
+                    "**What is BIS?**\n\n"
+                    "BIS (Bureau of Indian Standards) ensures minimum safety and quality "
+                    "standards for certain products in India.\n\n"
+                    "**Why it matters:** It protects consumers from unsafe products."
+                )
+
+            # 8️⃣ Cheap products
+            elif has_cheap:
+                st.markdown(
+                    "**Decision:** ⚠️ Higher risk\n\n"
+                    "**Reason:** Extremely low prices may compromise safety.\n\n"
+                    "**Action:** Verify BIS certification carefully."
+                )
+
+            # 9️⃣ Intelligent fallback
             else:
                 st.markdown(
                     "**Guidance:**\n\n"
-                    "• Verify BIS mark and license number\n"
-                    "• Avoid unrealistic safety claims\n"
-                    "• Buy from trusted brands\n"
-                    "• Report doubts to BIS\n\n"
-                    "This assistant provides awareness guidance only."
-                )
+                    "I need more information to guide you correctly.\n\n"
+                    "Please mention:\n"
+                    "• Product type\n"
+                    "• Brand name\n"
+                    "• Whether BIS mark is present\n\n"
+                    "_Consumer safety decisions should not be guessed._"
                 )
 # ==================================================
 # COMPLAINT CENTRE
@@ -483,6 +475,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
