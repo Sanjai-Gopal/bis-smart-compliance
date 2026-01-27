@@ -291,85 +291,112 @@ elif st.session_state.page == "assistant":
     st.header("🤖 Consumer Safety Assistant")
 
     q = st.text_input(
-        "Ask your question (example: Is this product safe?, What is BIS?, Fake BIS?)"
+        "Ask your question (example: Should I buy this charger?, Is eco friendly safe?, Fake BIS?)"
     )
 
     if st.button("Get Answer"):
         if not q.strip():
-            st.warning("Please type a question.")
+            st.warning("Please type your question.")
         else:
             ql = q.lower()
 
-            # ================= BASIC QUESTIONS =================
-            if "bis" in ql and ("what" in ql or "meaning" in ql):
-                st.info(
-                    "BIS stands for Bureau of Indian Standards. "
-                    "It ensures that certain products meet minimum safety and quality standards in India."
+            # ============ INTENT DETECTION ============
+            intents = {
+                "bis": any(k in ql for k in ["bis", "certification", "certified"]),
+                "safety": any(k in ql for k in ["safe", "unsafe", "danger", "risk"]),
+                "buy": any(k in ql for k in ["buy", "purchase", "use"]),
+                "fake": any(k in ql for k in ["fake", "false", "duplicate"]),
+                "complain": any(k in ql for k in ["complain", "report", "complaint"]),
+                "brand": any(k in ql for k in ["brand", "company", "manufacturer"]),
+                "eco": any(k in ql for k in ["eco", "green", "environment"]),
+                "electric": any(k in ql for k in ["charger", "electric", "heater", "power"]),
+                "cheap": any(k in ql for k in ["cheap", "low price", "very low"]),
+            }
+
+            # ============ RESPONSE LOGIC ============
+            # Case 1: Buying + Safety (most common)
+            if intents["buy"] and intents["safety"]:
+                st.markdown(
+                    "**Final Answer:** ⚠️ Decide after verification\n\n"
+                    "**Reasoning:** Product safety depends on BIS certification, "
+                    "brand reliability, and realistic claims.\n\n"
+                    "**What BIS expects:** Mandatory BIS standards for regulated products.\n\n"
+                    "**What you should do:**\n"
+                    "• Check BIS mark and license number\n"
+                    "• Avoid unrealistic claims\n"
+                    "• Buy from trusted sellers"
                 )
 
-            elif "is safe" in ql or "safe to use" in ql:
-                st.info(
-                    "Safety depends on the product type, brand, and BIS certification. "
-                    "Check for BIS mark and avoid unrealistic claims."
+            # Case 2: Eco-friendly confusion
+            elif intents["eco"]:
+                st.markdown(
+                    "**Final Answer:** ⚠️ Marketing term only\n\n"
+                    "**Reasoning:** BIS does not certify products as eco-friendly.\n\n"
+                    "**What BIS says:** Only safety and quality standards are regulated.\n\n"
+                    "**What you should do:** Focus on BIS safety certification, not eco claims."
                 )
 
-            # ================= FAKE / MISLEADING =================
-            elif "fake" in ql or "false" in ql or "duplicate" in ql:
-                st.info(
-                    "Fake BIS marks are illegal. "
-                    "You should avoid such products and report them to BIS through the official complaint portal."
+            # Case 3: Electrical products
+            elif intents["electric"]:
+                st.markdown(
+                    "**Final Answer:** ⚠️ Needs BIS safety compliance\n\n"
+                    "**Reasoning:** Electrical products can cause shock or fire.\n\n"
+                    "**What BIS says:** IS 13252 is required for many electrical items.\n\n"
+                    "**What you should do:** Avoid products without BIS mark."
                 )
 
-            elif "eco" in ql:
-                st.info(
-                    "Eco-friendly is a marketing term. "
-                    "BIS does not officially certify products as eco-friendly."
+            # Case 4: Fake BIS
+            elif intents["fake"]:
+                st.markdown(
+                    "**Final Answer:** ❌ Do not use\n\n"
+                    "**Reasoning:** Fake BIS marks hide safety risks.\n\n"
+                    "**What BIS says:** Fake certification is illegal.\n\n"
+                    "**What you should do:** Do not buy and report to BIS."
                 )
 
-            # ================= BUYING DECISIONS =================
-            elif "should i buy" in ql or "buy or not" in ql:
-                st.info(
-                    "Before buying, check:\n"
-                    "• BIS mark\n"
-                    "• Trusted brand\n"
-                    "• Manufacturer details\n"
-                    "• Warranty information"
-                )
-
-            elif "cheap" in ql or "low price" in ql:
-                st.info(
-                    "Very low-priced electrical products may compromise safety. "
-                    "Always check BIS certification and brand reliability."
-                )
-
-            # ================= BRAND QUESTIONS =================
-            elif "brand" in ql:
-                st.info(
-                    "BIS certification is product-specific, not brand-wide. "
-                    "Even trusted brands must certify individual models."
-                )
-
-            # ================= COMPLAINT =================
-            elif "complain" in ql or "report" in ql:
-                st.info(
-                    "You can file a complaint for fake BIS marks, unsafe products, "
-                    "or misleading claims on the official BIS consumer portal:\n"
+            # Case 5: Complaint
+            elif intents["complain"]:
+                st.markdown(
+                    "**Final Answer:** 📢 File an official complaint\n\n"
+                    "**Reasoning:** BIS investigates unsafe or misleading products.\n\n"
+                    "**What you should do:** Submit details at:\n"
                     "https://consumerapp.bis.gov.in"
                 )
 
-            # ================= ELECTRICAL =================
-            elif "charger" in ql or "electric" in ql:
-                st.info(
-                    "Electrical products must follow IS 13252 safety standards. "
-                    "Avoid products that heat excessively or lack BIS marks."
+            # Case 6: Brand trust
+            elif intents["brand"]:
+                st.markdown(
+                    "**Final Answer:** ⚠️ Brand name alone is not enough\n\n"
+                    "**Reasoning:** BIS certification is product- and model-specific.\n\n"
+                    "**What you should do:** Verify the exact model and BIS mark."
                 )
 
-            # ================= UNKNOWN / SAFE FALLBACK =================
+            # Case 7: Cheap products
+            elif intents["cheap"]:
+                st.markdown(
+                    "**Final Answer:** ⚠️ Higher risk\n\n"
+                    "**Reasoning:** Extremely low prices often compromise safety.\n\n"
+                    "**What you should do:** Check BIS certification carefully."
+                )
+
+            # Case 8: BIS explanation
+            elif intents["bis"]:
+                st.markdown(
+                    "**Final Answer:** ℹ️ BIS ensures minimum safety standards\n\n"
+                    "**Explanation:** BIS defines quality and safety requirements for "
+                    "certain products in India.\n\n"
+                    "**What you should do:** Look for BIS mark and license number."
+                )
+
+            # Fallback (always safe)
             else:
-                st.info(
-                    "For consumer safety, always verify BIS mark, brand details, "
-                    "and manufacturer information. "
-                    "When in doubt, consult official BIS sources."
+                st.markdown(
+                    "**Guidance:**\n\n"
+                    "• Verify BIS mark and license number\n"
+                    "• Avoid unrealistic safety claims\n"
+                    "• Buy from trusted brands\n"
+                    "• Report doubts to BIS\n\n"
+                    "This assistant provides awareness guidance only."
                 )
 # ==================================================
 # COMPLAINT CENTRE
@@ -455,6 +482,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
