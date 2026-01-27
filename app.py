@@ -1,71 +1,70 @@
 import streamlit as st
 import re
 
-# ================= PAGE CONFIG =================
+# ================= BASIC CONFIG =================
 st.set_page_config(
     page_title="BIS Consumer Safety Portal",
     page_icon="🛡️",
     layout="wide"
 )
 
-# ================= PREMIUM CSS =================
+# ================= STYLING =================
 st.markdown("""
 <style>
-@keyframes fadeIn {
-  from {opacity:0; transform:translateY(15px);}
+@keyframes fadeUp {
+  from {opacity:0; transform:translateY(12px);}
   to {opacity:1; transform:translateY(0);}
 }
-@keyframes gradientMove {
+@keyframes bgMove {
   0%{background-position:0% 50%}
   50%{background-position:100% 50%}
   100%{background-position:0% 50%}
 }
-.fade { animation: fadeIn 0.6s ease-in-out; }
+.fade {animation: fadeUp 0.6s ease-in-out}
 
 .hero {
   background: linear-gradient(270deg,#0b1c3d,#0e2a5a,#0b1c3d);
   background-size:600% 600%;
-  animation:gradientMove 14s ease infinite;
-  padding:45px;
-  border-radius:20px;
-  text-align:center;
-  color:white;
-  margin-bottom:35px;
-}
-
-.nav-btn {
-  background:#111827;
-  padding:14px 22px;
-  border-radius:12px;
-  border:1px solid #1f2937;
-}
-
-.box-ok{background:#0f5132;padding:16px;border-radius:12px;color:white}
-.box-warn{background:#664d03;padding:16px;border-radius:12px;color:white}
-.box-bad{background:#842029;padding:16px;border-radius:12px;color:white}
-.box-info{background:#0d6efd;padding:16px;border-radius:12px;color:white}
-
-.section {
-  background:#0f172a;
-  padding:25px;
+  animation:bgMove 15s ease infinite;
+  padding:40px;
   border-radius:18px;
-  margin-bottom:25px;
+  color:white;
+  text-align:center;
+  margin-bottom:30px;
 }
+
+.nav-btn button {
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+}
+
+.card {
+  background:#0f172a;
+  padding:22px;
+  border-radius:16px;
+  margin-bottom:20px;
+}
+
+.ok{background:#0f5132;padding:14px;border-radius:10px;color:white}
+.warn{background:#664d03;padding:14px;border-radius:10px;color:white}
+.bad{background:#842029;padding:14px;border-radius:10px;color:white}
+.info{background:#0d6efd;padding:14px;border-radius:10px;color:white}
 </style>
 """, unsafe_allow_html=True)
 
-# ================= BRAND DATABASE =================
-BRANDS = {
-    "havells":"Approved","philips":"Approved","bajaj":"Approved","usha":"Approved","orient":"Approved",
-    "crompton":"Approved","godrej":"Approved","lg":"Approved","samsung":"Approved","sony":"Approved",
-    "panasonic":"Approved","bosch":"Approved","whirlpool":"Approved","voltas":"Approved",
-    "ifb":"Approved","onida":"Approved","haier":"Approved","mi":"Approved","asus":"Approved",
-    "hp":"Approved","dell":"Approved","lenovo":"Approved","acer":"Approved","boat":"Approved",
-    "wipro":"Approved","v-guard":"Approved","prestige":"Approved","kent":"Approved",
-    "quickcharge pro":"Disapproved","powermax":"Disapproved"
+# ================= BRAND DATA (SAFE DEMO) =================
+APPROVED_BRANDS = {
+    "havells","philips","bajaj","usha","orient","crompton","godrej","lg","samsung",
+    "sony","panasonic","bosch","whirlpool","voltas","blue star","ifb","onida",
+    "haier","hitachi","mi","xiaomi","asus","hp","dell","lenovo","acer","boat",
+    "noise","jbl","kent","aquaguard","livpure","v-guard","luminous","wipro",
+    "prestige","pigeon","cello"
 }
 
-# ================= SESSION =================
+DISAPPROVED_BRANDS = {"quickcharge pro","powermax","supervolt"}
+
+# ================= SESSION NAV =================
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
@@ -73,7 +72,7 @@ if "page" not in st.session_state:
 st.markdown("""
 <div class="hero fade">
 <h1>🛡️ BIS Consumer Safety Portal</h1>
-<p>Easy product safety help for everyone — even if English is little</p>
+<p>Simple product safety guidance for everyone</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -83,84 +82,108 @@ if c1.button("🏠 Home"): st.session_state.page="home"
 if c2.button("🔍 Product Safety"): st.session_state.page="safety"
 if c3.button("🏷️ Brand Check"): st.session_state.page="brand"
 if c4.button("🤖 Ask Assistant"): st.session_state.page="assistant"
-if c5.button("📢 Feedback"): st.session_state.page="feedback"
+if c5.button("📢 Complaint Centre"): st.session_state.page="complaint"
 
 st.divider()
 
 # ================= HOME =================
 if st.session_state.page=="home":
-    st.markdown('<div class="fade"><h2>👋 Welcome</h2></div>', unsafe_allow_html=True)
+    st.markdown("## Welcome", class_="fade")
     st.markdown("""
-    <div class="section">
-    ✔ Check product safety  
-    ✔ Detect fake BIS claims  
-    ✔ Verify trusted brands  
-    ✔ Get help easily  
+    <div class="card">
+    This platform helps consumers:
+    <br>✔ Understand product safety claims  
+    <br>✔ Avoid fake BIS markings  
+    <br>✔ Check commonly trusted brands  
+    <br>✔ Reach official complaint channels easily  
     </div>
     """, unsafe_allow_html=True)
 
 # ================= PRODUCT SAFETY =================
 elif st.session_state.page=="safety":
     st.header("🔍 Product Safety Check")
-    text = st.text_area("Write what is written on product box")
+    text = st.text_area("Write what is written on the product (simple English is OK)")
 
-    if st.button("Analyze"):
+    if st.button("Check Safety"):
         if not text.strip():
-            st.warning("Please write something.")
+            st.warning("Please enter product information.")
         else:
-            t=text.lower()
-            if "eco" in t:
-                st.markdown("<div class='box-warn'>Eco-friendly is only a marketing term.</div>",unsafe_allow_html=True)
-            if "shock" in t or "electric" in t:
-                st.markdown("<div class='box-ok'>Electrical products require IS 13252 testing.</div>",unsafe_allow_html=True)
-            if "water" in t:
-                st.markdown("<div class='box-ok'>Waterproof claims need IP rating.</div>",unsafe_allow_html=True)
+            t = text.lower()
+            shown = False
+
+            if re.search(r"eco|green|nature", t):
+                st.markdown("<div class='warn'>“Eco-friendly” is a marketing term. BIS does not certify it.</div>", unsafe_allow_html=True)
+                shown = True
+
+            if re.search(r"shock|electric|charger|current|power", t):
+                st.markdown("<div class='ok'>Electrical products should comply with IS 13252 safety standard.</div>", unsafe_allow_html=True)
+                shown = True
+
+            if re.search(r"water|rain|ip|splash", t):
+                st.markdown("<div class='ok'>Waterproof claims require IP rating as per IS 60529.</div>", unsafe_allow_html=True)
+                shown = True
+
+            if re.search(r"bis|certified|approved", t):
+                st.markdown("<div class='warn'>BIS claim must include a valid CM/L license number.</div>", unsafe_allow_html=True)
+                shown = True
+
+            if not shown:
+                st.markdown("<div class='info'>No major regulated safety claims detected. Please check BIS mark manually.</div>", unsafe_allow_html=True)
 
 # ================= BRAND CHECK =================
 elif st.session_state.page=="brand":
     st.header("🏷️ Brand Verification")
     brand = st.text_input("Enter brand name")
 
-    if st.button("Verify"):
-        b=brand.lower().strip()
-        if not b:
-            st.warning("Enter brand name.")
-        elif b in BRANDS:
-            status=BRANDS[b]
-            if status=="Approved":
-                st.markdown(f"<div class='box-ok'>✅ {brand.title()} is commonly BIS approved.</div>",unsafe_allow_html=True)
-            else:
-                st.markdown(f"<div class='box-bad'>❌ {brand.title()} has safety concerns.</div>",unsafe_allow_html=True)
+    if st.button("Verify Brand"):
+        if not brand.strip():
+            st.warning("Please enter a brand name.")
         else:
-            st.markdown("<div class='box-info'>Brand not in demo list. Check official BIS site.</div>",unsafe_allow_html=True)
+            b = brand.lower().strip()
+            if b in APPROVED_BRANDS:
+                st.markdown(f"<div class='ok'>✅ {brand.title()} is commonly associated with BIS-compliant products.</div>", unsafe_allow_html=True)
+            elif b in DISAPPROVED_BRANDS:
+                st.markdown(f"<div class='bad'>❌ {brand.title()} has reported fake or unsafe claims.</div>", unsafe_allow_html=True)
+            else:
+                st.markdown("<div class='info'>Brand not found in demo registry. Please verify on official BIS website.</div>", unsafe_allow_html=True)
 
 # ================= AI ASSISTANT =================
 elif st.session_state.page=="assistant":
-    st.header("🤖 Consumer AI Assistant")
-    q=st.text_input("Ask your question")
+    st.header("🤖 Consumer Assistant")
+    q = st.text_input("Ask your question (simple English is fine)")
 
     if st.button("Get Answer"):
-        if "eco" in q.lower():
-            st.info("Eco-friendly is not BIS certified.")
-        elif "safe" in q.lower():
-            st.info("Check BIS mark and trusted brand.")
+        if not q.strip():
+            st.warning("Please ask a question.")
         else:
-            st.info("Please verify on official BIS website.")
+            ql = q.lower()
 
-# ================= FEEDBACK SYSTEM =================
-elif st.session_state.page=="feedback":
-    st.header("📢 User Feedback")
-    st.markdown("Help us improve this platform.")
+            if "eco" in ql:
+                st.info("Eco-friendly is a marketing term and not a BIS certification.")
+            elif "safe" in ql or "danger" in ql:
+                st.info("Check for BIS mark and trusted brand before buying.")
+            elif "bis" in ql:
+                st.info("BIS ensures minimum safety standards for certain products in India.")
+            elif "fake" in ql or "complain" in ql:
+                st.info("You can report fake BIS claims through the official BIS complaint portal.")
+            else:
+                st.info("For safety, always check BIS mark and verify through official sources.")
 
-    rating = st.select_slider(
-        "Rate your experience",
-        options=["⭐","⭐⭐","⭐⭐⭐","⭐⭐⭐⭐","⭐⭐⭐⭐⭐"]
-    )
-
-    comment = st.text_area("Your feedback (optional)")
-
-    if st.button("Submit Feedback"):
-        st.success("Thank you! Your feedback is recorded 🙏")
+# ================= COMPLAINT CENTRE =================
+elif st.session_state.page=="complaint":
+    st.header("📢 Complaint Centre")
+    st.markdown("""
+    <div class="card">
+    If you suspect:
+    <br>• Fake BIS certification  
+    <br>• Unsafe electrical product  
+    <br>• Misleading safety claims  
+    <br><br>
+    Please submit a complaint through the official BIS consumer portal.
+    <br><br>
+    🔗 <b>https://consumerapp.bis.gov.in</b>
+    </div>
+    """, unsafe_allow_html=True)
 
 # ================= FOOTER =================
 st.divider()
