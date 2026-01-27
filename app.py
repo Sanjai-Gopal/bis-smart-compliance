@@ -123,91 +123,105 @@ if st.session_state.page == "home":
 # ==================================================
 elif st.session_state.page == "safety":
     st.header("🔍 Product Safety Check")
+
     text = st.text_area(
         "Write what is written on the product or packaging (simple English is enough)"
     )
 
     if st.button("Analyze Safety"):
-        if not text.strip():
+        if not text or not text.strip():
             st.warning("Please enter product information.")
         else:
-            t = text.lower()
+            t = text.lower().strip()
 
-            risk_level = "LOW"
+            # ================= SMART ANALYSIS =================
             reasons = []
+            risk_score = 0
+            category = "General Product"
 
-            # --- CLAIM ANALYSIS ---
-            if re.search(r"eco|green|environment", t):
-                risk_level = "MEDIUM"
-                reasons.append(
-                    "‘Eco-friendly’ is a marketing term and not defined by BIS."
-                )
+            # -------- PRODUCT CATEGORY DETECTION --------
+            if any(k in t for k in ["charger", "heater", "iron", "electric", "power", "adapter"]):
+                category = "Electrical Product"
+                risk_score += 15
+                reasons.append("Electrical products have shock and fire risk.")
 
-            if re.search(r"shock|electric|current|charger|heater", t):
-                if risk_level != "HIGH":
-                    risk_level = "MEDIUM"
-                reasons.append(
-                    "Electrical products must comply with IS 13252 safety standard."
-                )
+            if any(k in t for k in ["toy", "baby", "child"]):
+                category = "Child Product"
+                risk_score += 20
+                reasons.append("Child safety products require strict BIS compliance.")
 
-            if re.search(r"water|waterproof|rain|ip rating", t):
-                if risk_level != "HIGH":
-                    risk_level = "MEDIUM"
-                reasons.append(
-                    "Waterproof claims require a valid IP rating (IS 60529)."
-                )
+            if any(k in t for k in ["water", "heater", "geyser", "bath"]):
+                risk_score += 10
+                reasons.append("Products used near water need extra safety protection.")
 
-            if re.search(r"explosion|blast|unbreakable|100% safe", t):
-                risk_level = "HIGH"
-                reasons.append(
-                    "Unrealistic safety claims are considered unsafe and misleading."
-                )
+            # -------- CLAIM ANALYSIS --------
+            if any(k in t for k in ["eco", "green", "environment"]):
+                risk_score += 10
+                reasons.append("Eco-friendly is a marketing term, not BIS certified.")
 
-            if re.search(r"bis certified|bis approved", t):
-                reasons.append(
-                    "BIS claims must include a valid CM/L license number."
-                )
+            if any(k in t for k in ["shockproof", "fireproof", "waterproof"]):
+                risk_score += 15
+                reasons.append("Strong safety claims require BIS test proof.")
 
-            # --- FINAL RECOMMENDATION ---
+            if any(k in t for k in ["explosion", "blast", "100% safe", "unbreakable"]):
+                risk_score += 40
+                reasons.append("Unrealistic claims are unsafe and misleading.")
+
+            # -------- BIS & LEGAL CHECK --------
+            if "bis" not in t:
+                risk_score += 15
+                reasons.append("No BIS reference found on product description.")
+
+            if "bis certified" in t or "bis approved" in t:
+                reasons.append("BIS claims must include a valid CM/L license number.")
+
+            # -------- PRICE & QUALITY SIGNAL --------
+            if any(k in t for k in ["cheap", "lowest price", "best price"]):
+                risk_score += 10
+                reasons.append("Very low price products may compromise safety.")
+
+            # -------- FINAL RISK NORMALIZATION --------
+            if risk_score > 100:
+                risk_score = 100
+
+            # ================= DECISION =================
             st.subheader("🧾 Safety Assessment Result")
 
-            if risk_level == "LOW":
-                st.markdown(
-                    "<div class='ok'>"
-                    "<b>Recommendation:</b> ✅ Safe to use<br>"
-                    "No major misleading or unsafe claims detected. "
-                    "Still verify BIS mark before purchase."
-                    "</div>",
-                    unsafe_allow_html=True,
-                )
+            if risk_score <= 25:
+                decision = "✅ Safe to use"
+                style = "ok"
+            elif risk_score <= 60:
+                decision = "⚠️ Use with caution"
+                style = "warn"
+            else:
+                decision = "❌ Not recommended to use"
+                style = "bad"
 
-            elif risk_level == "MEDIUM":
-                st.markdown(
-                    "<div class='warn'>"
-                    "<b>Recommendation:</b> ⚠️ Use with caution<br>"
-                    "Some claims require verification with BIS standards."
-                    "</div>",
-                    unsafe_allow_html=True,
-                )
+            st.markdown(
+                f"<div class='{style}'>"
+                f"<b>Product Category:</b> {category}<br>"
+                f"<b>Risk Score:</b> {risk_score} / 100<br>"
+                f"<b>Final Recommendation:</b> {decision}"
+                f"</div>",
+                unsafe_allow_html=True
+            )
 
-            else:  # HIGH
-                st.markdown(
-                    "<div class='bad'>"
-                    "<b>Recommendation:</b> ❌ Not recommended to use<br>"
-                    "Product claims appear unsafe or misleading."
-                    "</div>",
-                    unsafe_allow_html=True,
-                )
-
-            # --- EXPLANATION ---
+            # ================= EXPLANATION =================
             if reasons:
-                st.markdown("### 📌 Why this recommendation?")
+                st.markdown("### 📌 Why this decision?")
                 for r in reasons:
                     st.write("•", r)
 
+            # ================= CONSUMER GUIDANCE =================
+            st.markdown("### 🛡️ What you should do next")
+            st.write("• Check for BIS mark and license number on the product")
+            st.write("• Verify manufacturer details and address")
+            st.write("• Avoid unrealistic or exaggerated safety claims")
+            st.write("• Buy from trusted sellers")
+
             st.info(
-                "For final confirmation, always check the BIS mark and "
-                "verify details on the official BIS website."
+                "This assessment provides awareness guidance only. "
+                "Final safety confirmation should be done through BIS verification."
             )
 # ==================================================
 # BRAND CHECK
@@ -217,72 +231,93 @@ elif st.session_state.page == "brand":
 
     brand = st.text_input("Enter brand name (example: Havells, Philips, MI)")
     model = st.text_input("Enter model number (optional)")
+    product_type = st.selectbox(
+        "Select product type (optional)",
+        ["Not sure", "Electrical appliance", "Electronic gadget", "Child product", "Kitchen appliance", "Other"]
+    )
 
     if st.button("Verify Brand"):
-        if not brand.strip():
+        if not brand or not brand.strip():
             st.warning("Please enter a brand name.")
         else:
             b = brand.lower().strip()
 
-            st.subheader("📋 Brand Verification Result")
+            reasons = []
+            trust_score = 50  # neutral baseline
 
-            # ================= APPROVED BRANDS =================
+            # ---------- BRAND CATEGORY ----------
             if b in APPROVED_BRANDS:
-                st.markdown(
-                    f"<div class='ok'>"
-                    f"<b>Status:</b> ✅ Commonly BIS-compliant Brand<br>"
-                    f"<b>Brand:</b> {brand.title()}<br>"
-                    f"<b>Recommendation:</b> Safe to buy from this brand.<br>"
-                    f"</div>",
-                    unsafe_allow_html=True
-                )
+                trust_score += 30
+                reasons.append("Brand is widely known and commonly BIS-compliant.")
 
-                st.info(
-                    "Note: BIS certification is product- and model-specific. "
-                    "Always check the BIS mark and license number on the product."
-                )
-
-            # ================= DISAPPROVED BRANDS =================
             elif b in DISAPPROVED_BRANDS:
-                st.markdown(
-                    f"<div class='bad'>"
-                    f"<b>Status:</b> ❌ Reported / Unsafe Brand<br>"
-                    f"<b>Brand:</b> {brand.title()}<br>"
-                    f"<b>Recommendation:</b> Not recommended to buy.<br>"
-                    f"</div>",
-                    unsafe_allow_html=True
-                )
+                trust_score -= 40
+                reasons.append("Brand has been associated with misleading or unsafe claims.")
 
-                st.warning(
-                    "This brand has been associated with misleading or unsafe claims. "
-                    "Avoid purchasing and report if BIS mark appears fake."
-                )
-
-            # ================= UNKNOWN BRANDS =================
             else:
-                st.markdown(
-                    f"<div class='warn'>"
-                    f"<b>Status:</b> ⚠️ Brand Not Found in Registry<br>"
-                    f"<b>Brand:</b> {brand.title()}<br>"
-                    f"<b>Recommendation:</b> Use with caution.<br>"
-                    f"</div>",
-                    unsafe_allow_html=True
-                )
+                trust_score -= 10
+                reasons.append("Brand is not found in common consumer registry.")
 
-                st.info(
-                    "Unknown brand does not mean unsafe. "
-                    "Please verify manufacturer details, BIS mark, and license number carefully."
-                )
+            # ---------- PRODUCT TYPE RISK ----------
+            if product_type == "Electrical appliance":
+                trust_score -= 5
+                reasons.append("Electrical products require strict BIS safety compliance.")
 
-            # ================= MODEL NOTE =================
+            if product_type == "Child product":
+                trust_score -= 10
+                reasons.append("Child products require higher safety standards.")
+
+            # ---------- MODEL INFORMATION ----------
             if model.strip():
-                st.caption(
-                    f"Model entered: {model} — Please ensure this exact model "
-                    "has BIS certification."
-                )
+                reasons.append("Model number provided — BIS certification must be verified for this exact model.")
+            else:
+                trust_score -= 5
+                reasons.append("No model number provided, verification is incomplete.")
+
+            # ---------- SCORE NORMALIZATION ----------
+            if trust_score > 100:
+                trust_score = 100
+            if trust_score < 0:
+                trust_score = 0
+
+            # ---------- FINAL DECISION ----------
+            if trust_score >= 70:
+                decision = "✅ Trusted brand (verify model certification)"
+                style = "ok"
+            elif trust_score >= 40:
+                decision = "⚠️ Use with caution"
+                style = "warn"
+            else:
+                decision = "❌ Not recommended"
+                style = "bad"
+
+            # ---------- DISPLAY RESULT ----------
+            st.subheader("📋 Brand Trust Assessment")
+
+            st.markdown(
+                f"<div class='{style}'>"
+                f"<b>Brand:</b> {brand.title()}<br>"
+                f"<b>Trust Score:</b> {trust_score} / 100<br>"
+                f"<b>Final Recommendation:</b> {decision}"
+                f"</div>",
+                unsafe_allow_html=True
+            )
+
+            # ---------- EXPLANATION ----------
+            st.markdown("### 📌 Why this decision?")
+            for r in reasons:
+                st.write("•", r)
+
+            # ---------- CONSUMER GUIDANCE ----------
+            st.markdown("### 🛡️ What you should do next")
+            st.write("• Check BIS mark and CM/L license number on the product")
+            st.write("• Verify manufacturer name and address")
+            st.write("• Ensure certification matches the exact model")
+            st.write("• Avoid brands making unrealistic safety claims")
 
             st.info(
-                "For final confirmation, verify details on the official BIS website."
+                "This brand check provides awareness guidance only. "
+                "BIS certification is product- and model-specific."
             )
 # ==================================================
 # AI ASSISTANT (SAFE FALLBACK)
@@ -395,36 +430,47 @@ elif st.session_state.page == "assistant":
 # COMPLAINT CENTRE
 # ==================================================
 elif st.session_state.page == "complaint":
-    st.header("📢 Complaint Centre")
+    st.header("📢 BIS Consumer Complaint Centre")
 
     st.markdown(
         """
         <div class="card">
         <h3>When should you file a complaint?</h3>
         <ul>
-        <li>Product has a <b>fake or unclear BIS mark</b></li>
-        <li>Electrical product <b>overheats, sparks, or smells</b></li>
-        <li>Claims like <b>100% safe</b> or <b>explosion proof</b></li>
-        <li>No manufacturer address or license number</li>
+            <li>Product shows a <b>fake or unclear BIS mark</b></li>
+            <li>Electrical product <b>overheats, sparks, shocks, or smells</b></li>
+            <li>Product makes <b>unrealistic claims</b> like “100% safe” or “explosion proof”</li>
+            <li>No <b>manufacturer name, address, or license number</b></li>
+            <li>Product quality looks unsafe or misleading</li>
         </ul>
 
-        <h3>Why filing a complaint is important?</h3>
+        <h3>Why is filing a complaint important?</h3>
         <p>
-        Filing a complaint helps BIS take action against unsafe products,
-        protects other consumers, and improves overall product safety.
+        Filing a complaint helps BIS identify unsafe products, take legal action,
+        protect other consumers, and improve product safety standards in India.
         </p>
 
         <h3>Official BIS Consumer Complaint Portal</h3>
         <p>
-        Click below to submit your complaint directly to BIS:
+        Click the button below to file your complaint directly on the official BIS portal.
         </p>
 
-        <p style="font-size:18px;">
-        🔗 <b>https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/</b>
-        </p>
+        <a href="https://consumerapp.bis.gov.in" target="_blank">
+            <button style="
+                background:#1e40af;
+                color:white;
+                padding:14px 22px;
+                border:none;
+                border-radius:12px;
+                font-size:16px;
+                cursor:pointer;
+            ">
+                🚨 Go to Official BIS Complaint Portal
+            </button>
+        </a>
 
-        <p style="opacity:0.8;">
-        This portal is managed by the Bureau of Indian Standards (Government of India).
+        <p style="margin-top:12px; opacity:0.8;">
+        This portal is managed by the <b>Bureau of Indian Standards (Government of India)</b>.
         </p>
         </div>
         """,
@@ -432,8 +478,8 @@ elif st.session_state.page == "complaint":
     )
 
     st.info(
-        "Note: This platform does not collect complaints. "
-        "All official actions are handled only by BIS."
+        "Note: This platform does not collect complaints or personal data. "
+        "All complaints are handled only through the official BIS system."
     )
 # ==================================================
 # FEEDBACK (MUST-HAVE)
@@ -475,6 +521,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
