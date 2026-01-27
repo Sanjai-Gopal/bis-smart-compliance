@@ -400,7 +400,7 @@ elif st.session_state.page == "complaint":
         </p>
 
         <p style="font-size:18px;">
-        🔗 <b>https://consumerapp.bis.gov.in</b>
+        🔗 <b>https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/</b>
         </p>
 
         <p style="opacity:0.8;">
@@ -455,6 +455,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
