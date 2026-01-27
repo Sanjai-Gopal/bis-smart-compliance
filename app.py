@@ -374,92 +374,78 @@ elif st.session_state.page == "assistant":
 # ==================================================
 # COMPLAINT CENTRE
 # ==================================================
-elif st.session_state.page == "brand":
-    st.header("🏷️ Brand Verification")
+elif st.session_state.page == "complaint":
+    st.header("📢 Complaint Centre")
 
-    brand = st.text_input("Enter brand name (example: Havells, Philips, MI)")
-    model = st.text_input("Enter model number (optional)")
+    st.markdown(
+        """
+        <div class="card">
+        <h3>When should you file a complaint?</h3>
+        <ul>
+        <li>Product has a <b>fake or unclear BIS mark</b></li>
+        <li>Electrical product <b>overheats, sparks, or smells</b></li>
+        <li>Claims like <b>100% safe</b> or <b>explosion proof</b></li>
+        <li>No manufacturer address or license number</li>
+        </ul>
 
-    if st.button("Verify Brand"):
-        if not brand.strip():
-            st.warning("Please enter a brand name.")
-        else:
-            b = brand.lower().strip()
+        <h3>Why filing a complaint is important?</h3>
+        <p>
+        Filing a complaint helps BIS take action against unsafe products,
+        protects other consumers, and improves overall product safety.
+        </p>
 
-            st.subheader("📋 Brand Verification Result")
+        <h3>Official BIS Consumer Complaint Portal</h3>
+        <p>
+        Click below to submit your complaint directly to BIS:
+        </p>
 
-            # ================= APPROVED BRANDS =================
-            if b in APPROVED_BRANDS:
-                st.markdown(
-                    f"<div class='ok'>"
-                    f"<b>Status:</b> ✅ Commonly BIS-compliant Brand<br>"
-                    f"<b>Brand:</b> {brand.title()}<br>"
-                    f"<b>Recommendation:</b> Safe to buy from this brand.<br>"
-                    f"</div>",
-                    unsafe_allow_html=True
-                )
+        <p style="font-size:18px;">
+        🔗 <b>https://consumerapp.bis.gov.in</b>
+        </p>
 
-                st.info(
-                    "Note: BIS certification is product- and model-specific. "
-                    "Always check the BIS mark and license number on the product."
-                )
+        <p style="opacity:0.8;">
+        This portal is managed by the Bureau of Indian Standards (Government of India).
+        </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
-            # ================= DISAPPROVED BRANDS =================
-            elif b in DISAPPROVED_BRANDS:
-                st.markdown(
-                    f"<div class='bad'>"
-                    f"<b>Status:</b> ❌ Reported / Unsafe Brand<br>"
-                    f"<b>Brand:</b> {brand.title()}<br>"
-                    f"<b>Recommendation:</b> Not recommended to buy.<br>"
-                    f"</div>",
-                    unsafe_allow_html=True
-                )
-
-                st.warning(
-                    "This brand has been associated with misleading or unsafe claims. "
-                    "Avoid purchasing and report if BIS mark appears fake."
-                )
-
-            # ================= UNKNOWN BRANDS =================
-            else:
-                st.markdown(
-                    f"<div class='warn'>"
-                    f"<b>Status:</b> ⚠️ Brand Not Found in Registry<br>"
-                    f"<b>Brand:</b> {brand.title()}<br>"
-                    f"<b>Recommendation:</b> Use with caution.<br>"
-                    f"</div>",
-                    unsafe_allow_html=True
-                )
-
-                st.info(
-                    "Unknown brand does not mean unsafe. "
-                    "Please verify manufacturer details, BIS mark, and license number carefully."
-                )
-
-            # ================= MODEL NOTE =================
-            if model.strip():
-                st.caption(
-                    f"Model entered: {model} — Please ensure this exact model "
-                    "has BIS certification."
-                )
-
-            st.info(
-                "For final confirmation, verify details on the official BIS website."
-            )
+    st.info(
+        "Note: This platform does not collect complaints. "
+        "All official actions are handled only by BIS."
+    )
 # ==================================================
 # FEEDBACK (MUST-HAVE)
 # ==================================================
 elif st.session_state.page == "feedback":
-    st.header("📝 Feedback")
+    st.header("📝 User Feedback")
+
+    st.markdown(
+        """
+        <div class="card">
+        <p>
+        Your feedback helps improve this consumer safety platform.
+        Please share your experience.
+        </p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
     name = st.text_input("Your Name (optional)")
-    fb = st.text_area("Your feedback")
+    rating = st.select_slider(
+        "Rate your experience",
+        options=["⭐", "⭐⭐", "⭐⭐⭐", "⭐⭐⭐⭐", "⭐⭐⭐⭐⭐"]
+    )
+    feedback = st.text_area("Your feedback or suggestion")
 
     if st.button("Submit Feedback"):
-        if not fb.strip():
-            st.warning("Please write feedback.")
+        if not feedback.strip():
+            st.warning("Please write some feedback before submitting.")
         else:
-            st.success("Thank you! Your feedback helps improve consumer safety.")
-
+            st.success("Thank you for your feedback! 🙏")
+            st.caption("Feedback recorded for improvement purposes.")
 # ==================================================
 # FOOTER
 # ==================================================
@@ -469,6 +455,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
