@@ -1,4 +1,4 @@
-streamlit as st
+import streamlit as st
 import re
 
 # ==================================================
@@ -475,6 +475,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
