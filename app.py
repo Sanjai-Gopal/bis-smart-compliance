@@ -123,34 +123,92 @@ if st.session_state.page == "home":
 # ==================================================
 elif st.session_state.page == "safety":
     st.header("🔍 Product Safety Check")
-    text = st.text_area("Write what is written on the product")
+    text = st.text_area(
+        "Write what is written on the product or packaging (simple English is enough)"
+    )
 
-    if st.button("Analyze"):
+    if st.button("Analyze Safety"):
         if not text.strip():
-            st.warning("Please enter product description.")
+            st.warning("Please enter product information.")
         else:
             t = text.lower()
-            found = False
 
-            if re.search(r"eco|green|nature", t):
-                st.markdown("<div class='warn'>Eco-friendly is a marketing term. BIS does not certify it.</div>", unsafe_allow_html=True)
-                found = True
+            risk_level = "LOW"
+            reasons = []
 
-            if re.search(r"shock|electric|charger|heater|current", t):
-                st.markdown("<div class='ok'>Electrical products should comply with IS 13252.</div>", unsafe_allow_html=True)
-                found = True
+            # --- CLAIM ANALYSIS ---
+            if re.search(r"eco|green|environment", t):
+                risk_level = "MEDIUM"
+                reasons.append(
+                    "‘Eco-friendly’ is a marketing term and not defined by BIS."
+                )
 
-            if re.search(r"water|rain|ip|splash", t):
-                st.markdown("<div class='ok'>Waterproof claims require IP rating (IS 60529).</div>", unsafe_allow_html=True)
-                found = True
+            if re.search(r"shock|electric|current|charger|heater", t):
+                if risk_level != "HIGH":
+                    risk_level = "MEDIUM"
+                reasons.append(
+                    "Electrical products must comply with IS 13252 safety standard."
+                )
 
-            if re.search(r"bis|certified", t):
-                st.markdown("<div class='warn'>BIS claim must include a valid license number.</div>", unsafe_allow_html=True)
-                found = True
+            if re.search(r"water|waterproof|rain|ip rating", t):
+                if risk_level != "HIGH":
+                    risk_level = "MEDIUM"
+                reasons.append(
+                    "Waterproof claims require a valid IP rating (IS 60529)."
+                )
 
-            if not found:
-                st.markdown("<div class='info'>No major regulated claims detected. Check BIS mark manually.</div>", unsafe_allow_html=True)
+            if re.search(r"explosion|blast|unbreakable|100% safe", t):
+                risk_level = "HIGH"
+                reasons.append(
+                    "Unrealistic safety claims are considered unsafe and misleading."
+                )
 
+            if re.search(r"bis certified|bis approved", t):
+                reasons.append(
+                    "BIS claims must include a valid CM/L license number."
+                )
+
+            # --- FINAL RECOMMENDATION ---
+            st.subheader("🧾 Safety Assessment Result")
+
+            if risk_level == "LOW":
+                st.markdown(
+                    "<div class='ok'>"
+                    "<b>Recommendation:</b> ✅ Safe to use<br>"
+                    "No major misleading or unsafe claims detected. "
+                    "Still verify BIS mark before purchase."
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+
+            elif risk_level == "MEDIUM":
+                st.markdown(
+                    "<div class='warn'>"
+                    "<b>Recommendation:</b> ⚠️ Use with caution<br>"
+                    "Some claims require verification with BIS standards."
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+
+            else:  # HIGH
+                st.markdown(
+                    "<div class='bad'>"
+                    "<b>Recommendation:</b> ❌ Not recommended to use<br>"
+                    "Product claims appear unsafe or misleading."
+                    "</div>",
+                    unsafe_allow_html=True,
+                )
+
+            # --- EXPLANATION ---
+            if reasons:
+                st.markdown("### 📌 Why this recommendation?")
+                for r in reasons:
+                    st.write("•", r)
+
+            st.info(
+                "For final confirmation, always check the BIS mark and "
+                "verify details on the official BIS website."
+            )
 # ==================================================
 # BRAND CHECK
 # ==================================================
@@ -234,4 +292,5 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
