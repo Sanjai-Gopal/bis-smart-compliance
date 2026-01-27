@@ -207,7 +207,7 @@ elif st.session_state.page == "complaint":
     <br><br>
     File complaint here:
     <br><br>
-    🔗 <b>https://consumerapp.bis.gov.in</b>
+    🔗 <b>https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/?lang=en</b>
     </div>
     """, unsafe_allow_html=True)
 
@@ -234,3 +234,4 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
