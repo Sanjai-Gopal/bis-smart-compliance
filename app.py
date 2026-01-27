@@ -318,21 +318,78 @@ elif st.session_state.page == "assistant":
 # ==================================================
 # COMPLAINT CENTRE
 # ==================================================
-elif st.session_state.page == "complaint":
-    st.header("📢 Complaint Centre")
-    st.markdown("""
-    <div class="card">
-    If you find:
-    <br>• Fake BIS mark  
-    <br>• Unsafe electrical product  
-    <br>• Misleading safety claims  
-    <br><br>
-    File complaint here:
-    <br><br>
-    🔗 <b>https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/?lang=en</b>
-    </div>
-    """, unsafe_allow_html=True)
+elif st.session_state.page == "brand":
+    st.header("🏷️ Brand Verification")
 
+    brand = st.text_input("Enter brand name (example: Havells, Philips, MI)")
+    model = st.text_input("Enter model number (optional)")
+
+    if st.button("Verify Brand"):
+        if not brand.strip():
+            st.warning("Please enter a brand name.")
+        else:
+            b = brand.lower().strip()
+
+            st.subheader("📋 Brand Verification Result")
+
+            # ================= APPROVED BRANDS =================
+            if b in APPROVED_BRANDS:
+                st.markdown(
+                    f"<div class='ok'>"
+                    f"<b>Status:</b> ✅ Commonly BIS-compliant Brand<br>"
+                    f"<b>Brand:</b> {brand.title()}<br>"
+                    f"<b>Recommendation:</b> Safe to buy from this brand.<br>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+
+                st.info(
+                    "Note: BIS certification is product- and model-specific. "
+                    "Always check the BIS mark and license number on the product."
+                )
+
+            # ================= DISAPPROVED BRANDS =================
+            elif b in DISAPPROVED_BRANDS:
+                st.markdown(
+                    f"<div class='bad'>"
+                    f"<b>Status:</b> ❌ Reported / Unsafe Brand<br>"
+                    f"<b>Brand:</b> {brand.title()}<br>"
+                    f"<b>Recommendation:</b> Not recommended to buy.<br>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+
+                st.warning(
+                    "This brand has been associated with misleading or unsafe claims. "
+                    "Avoid purchasing and report if BIS mark appears fake."
+                )
+
+            # ================= UNKNOWN BRANDS =================
+            else:
+                st.markdown(
+                    f"<div class='warn'>"
+                    f"<b>Status:</b> ⚠️ Brand Not Found in Registry<br>"
+                    f"<b>Brand:</b> {brand.title()}<br>"
+                    f"<b>Recommendation:</b> Use with caution.<br>"
+                    f"</div>",
+                    unsafe_allow_html=True
+                )
+
+                st.info(
+                    "Unknown brand does not mean unsafe. "
+                    "Please verify manufacturer details, BIS mark, and license number carefully."
+                )
+
+            # ================= MODEL NOTE =================
+            if model.strip():
+                st.caption(
+                    f"Model entered: {model} — Please ensure this exact model "
+                    "has BIS certification."
+                )
+
+            st.info(
+                "For final confirmation, verify details on the official BIS website."
+            )
 # ==================================================
 # FEEDBACK (MUST-HAVE)
 # ==================================================
@@ -356,6 +413,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
