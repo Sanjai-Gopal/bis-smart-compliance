@@ -232,25 +232,89 @@ elif st.session_state.page == "brand":
 # AI ASSISTANT (SAFE FALLBACK)
 # ==================================================
 elif st.session_state.page == "assistant":
-    st.header("🤖 Consumer AI Assistant")
-    q = st.text_input("Ask your question")
+    st.header("🤖 Consumer Safety Assistant")
+
+    q = st.text_input(
+        "Ask your question (example: Is this product safe?, What is BIS?, Fake BIS?)"
+    )
 
     if st.button("Get Answer"):
         if not q.strip():
-            st.warning("Please ask something.")
+            st.warning("Please type a question.")
         else:
             ql = q.lower()
-            if "eco" in ql:
-                st.info("Eco-friendly is a marketing term, not BIS certified.")
-            elif "bis" in ql:
-                st.info("BIS ensures minimum safety standards for products in India.")
-            elif "safe" in ql or "danger" in ql:
-                st.info("Check BIS mark and trusted brands before buying.")
-            elif "fake" in ql:
-                st.info("Fake BIS claims can be reported on the official BIS portal.")
-            else:
-                st.info("Always verify BIS mark and purchase from trusted sellers.")
 
+            # ================= BASIC QUESTIONS =================
+            if "bis" in ql and ("what" in ql or "meaning" in ql):
+                st.info(
+                    "BIS stands for Bureau of Indian Standards. "
+                    "It ensures that certain products meet minimum safety and quality standards in India."
+                )
+
+            elif "is safe" in ql or "safe to use" in ql:
+                st.info(
+                    "Safety depends on the product type, brand, and BIS certification. "
+                    "Check for BIS mark and avoid unrealistic claims."
+                )
+
+            # ================= FAKE / MISLEADING =================
+            elif "fake" in ql or "false" in ql or "duplicate" in ql:
+                st.info(
+                    "Fake BIS marks are illegal. "
+                    "You should avoid such products and report them to BIS through the official complaint portal."
+                )
+
+            elif "eco" in ql:
+                st.info(
+                    "Eco-friendly is a marketing term. "
+                    "BIS does not officially certify products as eco-friendly."
+                )
+
+            # ================= BUYING DECISIONS =================
+            elif "should i buy" in ql or "buy or not" in ql:
+                st.info(
+                    "Before buying, check:\n"
+                    "• BIS mark\n"
+                    "• Trusted brand\n"
+                    "• Manufacturer details\n"
+                    "• Warranty information"
+                )
+
+            elif "cheap" in ql or "low price" in ql:
+                st.info(
+                    "Very low-priced electrical products may compromise safety. "
+                    "Always check BIS certification and brand reliability."
+                )
+
+            # ================= BRAND QUESTIONS =================
+            elif "brand" in ql:
+                st.info(
+                    "BIS certification is product-specific, not brand-wide. "
+                    "Even trusted brands must certify individual models."
+                )
+
+            # ================= COMPLAINT =================
+            elif "complain" in ql or "report" in ql:
+                st.info(
+                    "You can file a complaint for fake BIS marks, unsafe products, "
+                    "or misleading claims on the official BIS consumer portal:\n"
+                    "https://consumerapp.bis.gov.in"
+                )
+
+            # ================= ELECTRICAL =================
+            elif "charger" in ql or "electric" in ql:
+                st.info(
+                    "Electrical products must follow IS 13252 safety standards. "
+                    "Avoid products that heat excessively or lack BIS marks."
+                )
+
+            # ================= UNKNOWN / SAFE FALLBACK =================
+            else:
+                st.info(
+                    "For consumer safety, always verify BIS mark, brand details, "
+                    "and manufacturer information. "
+                    "When in doubt, consult official BIS sources."
+                )
 # ==================================================
 # COMPLAINT CENTRE
 # ==================================================
@@ -292,5 +356,6 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
