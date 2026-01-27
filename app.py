@@ -1,4 +1,4 @@
-import streamlit as st
+streamlit as st
 import re
 
 # ==================================================
@@ -398,6 +398,7 @@ elif st.session_state.page == "assistant":
                     "• Report doubts to BIS\n\n"
                     "This assistant provides awareness guidance only."
                 )
+                )
 # ==================================================
 # COMPLAINT CENTRE
 # ==================================================
@@ -482,6 +483,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
