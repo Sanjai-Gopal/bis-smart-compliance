@@ -455,7 +455,7 @@ elif st.session_state.page == "complaint":
         Click the button below to file your complaint directly on the official BIS portal.
         </p>
 
-        <a href="https://consumerapp.bis.gov.in" target="_blank">
+        <a href="https://www.bing.com/ck/a?!&&p=3da73ad258c8f3207551bc083d661321c650ed874f1ac5cdae1c897befa9875cJmltdHM9MTc2OTQ3MjAwMA&ptn=3&ver=2&hsh=4&fclid=144e2a47-d94b-6a15-2583-3c30d8896bd0&psq=official+complaint+centre+of+bis&u=a1aHR0cHM6Ly93d3cuYmlzLmdvdi5pbi9jb25zdW1lci1vdmVydmlldy9jb25zdW1lci1vdmVydmlld3Mvb25saW5lLWNvbXBsYWludC1yZWdpc3RyYXRpb24vP2xhbmc9ZW4" target="_blank">
             <button style="
                 background:#1e40af;
                 color:white;
@@ -521,6 +521,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
