@@ -15,54 +15,100 @@ st.set_page_config(
 # ==================================================
 st.markdown("""
 <style>
-body { background-color:#0b1220; }
+/* ================= GLOBAL ================= */
+body {
+  background-color: #0b1220;
+}
 
+/* ================= ANIMATIONS ================= */
 @keyframes fadeUp {
-  from {opacity:0; transform:translateY(15px);}
-  to {opacity:1; transform:translateY(0);}
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+@keyframes glow {
+  0% { box-shadow: 0 0 0px rgba(59,130,246,0.2); }
+  50% { box-shadow: 0 0 18px rgba(59,130,246,0.35); }
+  100% { box-shadow: 0 0 0px rgba(59,130,246,0.2); }
+}
+
+/* ================= HERO ================= */
 .hero {
-  background: linear-gradient(135deg,#0b3c8c,#081f4d);
-  padding:40px;
-  border-radius:20px;
-  color:white;
-  text-align:center;
-  animation: fadeUp 0.8s ease;
+  background: linear-gradient(135deg, #0b3c8c, #081f4d);
+  padding: 40px;
+  border-radius: 22px;
+  color: white;
+  text-align: center;
+  animation: fadeUp 0.9s ease;
 }
 
-.nav button {
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  font-weight:600;
-}
-
+/* ================= CARDS ================= */
 .card {
-  background:#111827;
-  padding:22px;
-  border-radius:16px;
-  margin-bottom:20px;
+  background: #111827;
+  padding: 24px;
+  border-radius: 18px;
+  margin-bottom: 22px;
   animation: fadeUp 0.6s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.ok {background:#14532d;padding:14px;border-radius:10px;color:white}
-.warn {background:#78350f;padding:14px;border-radius:10px;color:white}
-.bad {background:#7f1d1d;padding:14px;border-radius:10px;color:white}
-.info {background:#1e40af;padding:14px;border-radius:10px;color:white}
-
-.footer {
-  text-align:center;
-  opacity:0.7;
-  font-size:14px;
-}
+/* Micro-interaction (premium feel) */
 .card:hover {
-  transform: scale(1.01);
-  transition: transform 0.3s ease;
+  transform: scale(1.015);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.45);
 }
 
+/* ================= STATUS BLOCKS ================= */
+.ok {
+  background: linear-gradient(135deg, #14532d, #166534);
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
+  animation: glow 3s infinite;
+}
+
+.warn {
+  background: linear-gradient(135deg, #78350f, #92400e);
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
+}
+
+.bad {
+  background: linear-gradient(135deg, #7f1d1d, #991b1b);
+  padding: 16px;
+  border-radius: 12px;
+  color: white;
+}
+
+/* ================= BUTTONS ================= */
+button {
+  border-radius: 14px !important;
+  font-weight: 600 !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+}
+
+/* ================= FOOTER ================= */
+.footer {
+  text-align: center;
+  opacity: 0.75;
+  font-size: 14px;
+  margin-top: 10px;
+}
 </style>
 """, unsafe_allow_html=True)
+
 
 
 # ==================================================
@@ -547,6 +593,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
