@@ -58,6 +58,11 @@ body { background-color:#0b1220; }
 }
 </style>
 """, unsafe_allow_html=True)
+.card:hover {
+  transform: scale(1.01);
+  transition: 0.3s ease;
+}
+
 
 # ==================================================
 # DATA (DEMO – SAFE FOR JUDGES)
@@ -121,6 +126,8 @@ if st.session_state.page == "home":
 # ==================================================
 # PRODUCT SAFETY CHECK
 # ==================================================
+
+
 elif st.session_state.page == "safety":
     st.header("🔍 Product Safety Check")
 
@@ -195,6 +202,35 @@ elif st.session_state.page == "safety":
                 """,
                 unsafe_allow_html=True
             )
+            st.markdown("### 🔍 Brand Confidence Indicator")
+
+if decision.startswith("✅"):
+    st.write("🟢 Widely trusted brand (model verification required)")
+elif decision.startswith("⚠️"):
+    st.write("🟡 Limited public information available")
+else:
+    st.write("🔴 Consumer caution advised")
+
+            st.markdown("### 🧠 Why this matters for consumers")
+st.write(
+    "Misleading safety claims can cause electric shock, fire accidents, or child injury. "
+    "This platform helps consumers make safer decisions before purchase."
+)
+st.markdown("### 📜 BIS Safety Reference (Awareness)")
+st.write(
+    "• Electrical products: IS 13252\n"
+    "• Waterproof claims: IS 60529\n"
+    "• Child safety products: IS 9873\n\n"
+    "These references are for consumer awareness only."
+)
+st.markdown("### 👉 Recommended Next Step")
+
+if confidence == "High":
+    st.success("You may proceed, but still verify the BIS mark physically.")
+elif confidence == "Medium":
+    st.warning("Please verify the BIS license number before purchase.")
+else:
+    st.error("Avoid this product and consider reporting misleading claims.")
 
             st.markdown("### 📌 Why this result?")
             for r in reasons:
@@ -312,6 +348,13 @@ elif st.session_state.page == "assistant":
     )
 
     if st.button("Get Answer"):
+    if len(q.split()) < 3:
+    st.info(
+        "Could you please add more details? "
+        "For example: product type or brand name."
+    )
+    st.stop()
+
         if not q or not q.strip():
             st.warning("Please type a question.")
         else:
@@ -503,6 +546,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
