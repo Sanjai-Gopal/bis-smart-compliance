@@ -404,106 +404,194 @@ elif st.session_state.page == "brand":
 elif st.session_state.page == "assistant":
     st.header("🤖 Consumer Safety Assistant")
 
-    q = st.text_input(
-        "Ask your question (example: Should I buy this charger?, Is BIS compulsory?, Fake BIS mark?)"
+    st.caption(
+        "Ask in simple English. Example: "
+        "Is Samsung BIS certified? | "
+        "Should I buy this charger? | "
+        "What if BIS mark is fake?"
     )
 
+    q = st.text_input("Ask your question")
+
     if st.button("Get Answer"):
-
-        # --- CLARIFICATION CHECK ---
-        if not q or not q.strip():
-            st.warning("Please type a question.")
-            st.stop()
-
-        if len(q.split()) < 3:
+        if not q or len(q.strip()) < 3:
             st.info(
-                "Please add a little more detail. "
-                "For example: product type or brand name."
+                "Please ask a complete question. "
+                "Example: Is Samsung charger BIS certified?"
             )
             st.stop()
 
-        ql = q.lower().strip()
+        ql = q.lower()
 
-        # ---------- BASIC SIGNAL CHECK ----------
-        has_bis = "bis" in ql or "certif" in ql
-        has_buy = "buy" in ql or "purchase" in ql or "use" in ql
-        has_safe = "safe" in ql or "danger" in ql or "risk" in ql
-        has_fake = "fake" in ql or "duplicate" in ql
-        has_complain = "complain" in ql or "report" in ql
-        has_eco = "eco" in ql or "green" in ql
-        has_electric = "charger" in ql or "electric" in ql or "heater" in ql
-        has_brand = "brand" in ql or "company" in ql
-        has_cheap = "cheap" in ql or "low price" in ql
+        # ================= INTENT DETECTION =================
+        asking_brand = any(w in ql for w in ["samsung", "lg", "philips", "mi", "sony", "havells"])
+        asking_bis = "bis" in ql or "certif" in ql
+        asking_buy = any(w in ql for w in ["buy", "purchase", "use"])
+        asking_fake = "fake" in ql or "duplicate" in ql
+        asking_charger = "charger" in ql or "adapter" in ql
+        asking_child = "child" in ql or "baby" in ql
+        asking_safe = "safe" in ql or "danger" in ql or "risk" in ql
+        asking_complaint = "complain" in ql or "report" in ql
 
-        # ---------- SMART DECISION ENGINE ----------
-        if has_fake:
+        # ================= SMART RESPONSES =================
+
+        # 1️⃣ Brand + BIS question (MOST IMPORTANT)
+        if asking_brand and asking_bis:
             st.markdown(
-                "**Decision:** ❌ Not recommended\n\n"
-                "**Reason:** Fake or duplicate BIS marks indicate serious safety risk.\n\n"
-                "**Action:** Do not buy or use the product. "
-                "Report it on the official BIS portal:\n"
-                "https://consumerapp.bis.gov.in"
+                """
+                **Answer:**
+
+                Popular brands like Samsung, LG, Philips, Havells and others
+                **do manufacture BIS-certified products**, but **BIS certification
+                is NOT for the brand — it is for each specific product model.**
+
+                **What this means for consumers:**
+                • One Samsung product may be BIS certified  
+                • Another Samsung product may NOT be BIS certified  
+
+                **What you must check:**
+                ✔ BIS Standard Mark  
+                ✔ CM/L license number  
+                ✔ Product model matching the BIS record  
+
+                **Conclusion:**  
+                Do not trust the brand name alone. Always verify the BIS mark on the product.
+                """
             )
 
-        elif has_buy and has_electric:
+        # 2️⃣ Buying electrical product
+        elif asking_buy and asking_charger:
             st.markdown(
-                "**Decision:** ⚠️ Use only after verification\n\n"
-                "**Reason:** Electrical products can cause shock or fire if not certified.\n\n"
-                "**BIS Reference:** IS 13252\n\n"
-                "**Action:** Check BIS mark and license number before buying."
+                """
+                **Answer:**
+
+                Chargers and electrical products can cause **electric shock,
+                fire, or overheating** if not certified.
+
+                **BIS Rule:**  
+                Electrical products must comply with **IS 13252**.
+
+                **Before buying, always check:**
+                ✔ BIS mark on the product  
+                ✔ License number (CM/L)  
+                ✔ Manufacturer name and address  
+
+                **Recommendation:**  
+                Buy only after BIS verification.
+                """
             )
 
-        elif has_eco:
+        # 3️⃣ Fake BIS mark
+        elif asking_fake:
             st.markdown(
-                "**Decision:** ⚠️ Claim needs caution\n\n"
-                "**Reason:** Eco-friendly is a marketing term and not defined by BIS.\n\n"
-                "**Action:** Focus on safety certification, not eco claims."
+                """
+                **Answer:**
+
+                A fake or duplicate BIS mark is a **serious safety risk**.
+
+                **Why this is dangerous:**
+                • Product is untested  
+                • High risk of shock or fire  
+                • Illegal under Indian law  
+
+                **What you should do immediately:**
+                ❌ Do NOT buy or use the product  
+                📢 Report it on the official BIS portal  
+
+                **Official complaint link:**  
+                https://consumerapp.bis.gov.in
+                """
             )
 
-        elif has_brand and not has_bis:
+        # 4️⃣ Child safety questions
+        elif asking_child:
             st.markdown(
-                "**Decision:** ⚠️ Incomplete information\n\n"
-                "**Reason:** Brand name alone does not guarantee safety.\n\n"
-                "**Action:** Verify BIS mark for the specific product model."
+                """
+                **Answer:**
+
+                Products used by children must follow **strict BIS child safety standards**.
+
+                **Relevant BIS standard:**  
+                IS 9873 (Safety of toys and child products)
+
+                **Important note:**  
+                Terms like *child safe* or *kids friendly* are **not BIS certifications**.
+
+                **Recommendation:**  
+                Verify BIS compliance carefully before allowing children to use the product.
+                """
             )
 
-        elif has_safe:
+        # 5️⃣ General safety question
+        elif asking_safe:
             st.markdown(
-                "**Decision:** ⚠️ Depends on certification\n\n"
-                "**Reason:** Product safety depends on BIS compliance and realistic claims.\n\n"
-                "**Action:** Check BIS mark and avoid unrealistic promises."
+                """
+                **Answer:**
+
+                Product safety depends on **certification, realistic claims,
+                and manufacturing quality**.
+
+                **General consumer safety rules:**
+                • Check BIS mark  
+                • Avoid exaggerated claims like *100% safe*  
+                • Verify manufacturer details  
+
+                **Conclusion:**  
+                Safety should be verified — never assumed.
+                """
             )
 
-        elif has_complain:
+        # 6️⃣ Complaint guidance
+        elif asking_complaint:
             st.markdown(
-                "**Action:** 📢 File a complaint\n\n"
-                "**Official BIS portal:** https://consumerapp.bis.gov.in"
+                """
+                **Answer:**
+
+                You should file a complaint if:
+                • BIS mark looks fake  
+                • Product overheats or sparks  
+                • Misleading safety claims are used  
+
+                **Official BIS Consumer Complaint Portal:**  
+                https://consumerapp.bis.gov.in
+
+                **Your complaint helps protect other consumers.**
+                """
             )
 
-        elif has_bis:
+        # 7️⃣ BIS explanation (basic users)
+        elif asking_bis:
             st.markdown(
-                "**What is BIS?**\n\n"
-                "BIS (Bureau of Indian Standards) ensures minimum safety "
-                "and quality standards for products in India."
+                """
+                **What is BIS?**
+
+                BIS (Bureau of Indian Standards) is a Government of India body
+                that ensures **minimum safety and quality standards** for products.
+
+                **Why BIS matters:**
+                • Prevents unsafe products  
+                • Protects consumers  
+                • Reduces accidents and fraud  
+
+                **Always prefer BIS-certified products.**
+                """
             )
 
-        elif has_cheap:
-            st.markdown(
-                "**Decision:** ⚠️ Higher risk\n\n"
-                "**Reason:** Extremely low prices may compromise safety.\n\n"
-                "**Action:** Verify BIS certification carefully."
-            )
-
+        # 8️⃣ Intelligent fallback (REAL AI BEHAVIOR)
         else:
             st.markdown(
-                "**Guidance:**\n\n"
-                "Please mention:\n"
-                "• Product type\n"
-                "• Brand name\n"
-                "• Whether BIS mark is present\n\n"
-                "_Consumer safety decisions should not be guessed._"
-            )
+                """
+                **I need a little more information to guide you correctly.**
 
+                Please try adding:
+                • Product type (charger, toy, appliance)  
+                • Brand name  
+                • BIS mark present or not  
+
+                **Example:**  
+                *Is this Samsung charger BIS certified?*
+                """
+            )
 
 # ==================================================
 # COMPLAINT CENTRE
@@ -600,6 +688,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
