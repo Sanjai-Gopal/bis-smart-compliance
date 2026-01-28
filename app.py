@@ -371,110 +371,101 @@ elif st.session_state.page == "assistant":
     )
 
     if st.button("Get Answer"):
-    if len(q.split()) < 3:
-        st.info(
-            "Could you please add more details? "
-            "For example: product type or brand name."
-        )
-        st.stop()
 
-
+        # --- CLARIFICATION CHECK ---
         if not q or not q.strip():
             st.warning("Please type a question.")
+            st.stop()
+
+        if len(q.split()) < 3:
+            st.info(
+                "Please add a little more detail. "
+                "For example: product type or brand name."
+            )
+            st.stop()
+
+        ql = q.lower().strip()
+
+        # ---------- BASIC SIGNAL CHECK ----------
+        has_bis = "bis" in ql or "certif" in ql
+        has_buy = "buy" in ql or "purchase" in ql or "use" in ql
+        has_safe = "safe" in ql or "danger" in ql or "risk" in ql
+        has_fake = "fake" in ql or "duplicate" in ql
+        has_complain = "complain" in ql or "report" in ql
+        has_eco = "eco" in ql or "green" in ql
+        has_electric = "charger" in ql or "electric" in ql or "heater" in ql
+        has_brand = "brand" in ql or "company" in ql
+        has_cheap = "cheap" in ql or "low price" in ql
+
+        # ---------- SMART DECISION ENGINE ----------
+        if has_fake:
+            st.markdown(
+                "**Decision:** ❌ Not recommended\n\n"
+                "**Reason:** Fake or duplicate BIS marks indicate serious safety risk.\n\n"
+                "**Action:** Do not buy or use the product. "
+                "Report it on the official BIS portal:\n"
+                "https://consumerapp.bis.gov.in"
+            )
+
+        elif has_buy and has_electric:
+            st.markdown(
+                "**Decision:** ⚠️ Use only after verification\n\n"
+                "**Reason:** Electrical products can cause shock or fire if not certified.\n\n"
+                "**BIS Reference:** IS 13252\n\n"
+                "**Action:** Check BIS mark and license number before buying."
+            )
+
+        elif has_eco:
+            st.markdown(
+                "**Decision:** ⚠️ Claim needs caution\n\n"
+                "**Reason:** Eco-friendly is a marketing term and not defined by BIS.\n\n"
+                "**Action:** Focus on safety certification, not eco claims."
+            )
+
+        elif has_brand and not has_bis:
+            st.markdown(
+                "**Decision:** ⚠️ Incomplete information\n\n"
+                "**Reason:** Brand name alone does not guarantee safety.\n\n"
+                "**Action:** Verify BIS mark for the specific product model."
+            )
+
+        elif has_safe:
+            st.markdown(
+                "**Decision:** ⚠️ Depends on certification\n\n"
+                "**Reason:** Product safety depends on BIS compliance and realistic claims.\n\n"
+                "**Action:** Check BIS mark and avoid unrealistic promises."
+            )
+
+        elif has_complain:
+            st.markdown(
+                "**Action:** 📢 File a complaint\n\n"
+                "**Official BIS portal:** https://consumerapp.bis.gov.in"
+            )
+
+        elif has_bis:
+            st.markdown(
+                "**What is BIS?**\n\n"
+                "BIS (Bureau of Indian Standards) ensures minimum safety "
+                "and quality standards for products in India."
+            )
+
+        elif has_cheap:
+            st.markdown(
+                "**Decision:** ⚠️ Higher risk\n\n"
+                "**Reason:** Extremely low prices may compromise safety.\n\n"
+                "**Action:** Verify BIS certification carefully."
+            )
+
         else:
-            ql = q.lower().strip()
+            st.markdown(
+                "**Guidance:**\n\n"
+                "Please mention:\n"
+                "• Product type\n"
+                "• Brand name\n"
+                "• Whether BIS mark is present\n\n"
+                "_Consumer safety decisions should not be guessed._"
+            )
 
-            # ---------- BASIC SIGNAL CHECK ----------
-            has_bis = "bis" in ql or "certif" in ql
-            has_buy = "buy" in ql or "purchase" in ql or "use" in ql
-            has_safe = "safe" in ql or "danger" in ql or "risk" in ql
-            has_fake = "fake" in ql or "duplicate" in ql
-            has_complain = "complain" in ql or "report" in ql
-            has_eco = "eco" in ql or "green" in ql
-            has_electric = "charger" in ql or "electric" in ql or "heater" in ql
-            has_brand = "brand" in ql or "company" in ql
-            has_cheap = "cheap" in ql or "low price" in ql
-
-            # ---------- SMART DECISION ENGINE ----------
-
-            # 1️⃣ Very risky situations
-            if has_fake:
-                st.markdown(
-                    "**Decision:** ❌ Not recommended\n\n"
-                    "**Reason:** Fake or duplicate BIS marks indicate serious safety risk.\n\n"
-                    "**Action:** Do not buy or use the product. Report it on the official BIS portal:\n"
-                    "https://consumerapp.bis.gov.in"
-                )
-
-            # 2️⃣ Buying electrical product
-            elif has_buy and has_electric:
-                st.markdown(
-                    "**Decision:** ⚠️ Use only after verification\n\n"
-                    "**Reason:** Electrical products can cause shock or fire if not certified.\n\n"
-                    "**What BIS requires:** IS 13252 safety compliance.\n\n"
-                    "**Action:** Check BIS mark and license number before buying."
-                )
-
-            # 3️⃣ Eco-friendly confusion
-            elif has_eco:
-                st.markdown(
-                    "**Decision:** ⚠️ Claim needs caution\n\n"
-                    "**Reason:** Eco-friendly is a marketing term and not defined by BIS.\n\n"
-                    "**Action:** Focus on safety certification, not eco claims."
-                )
-
-            # 4️⃣ Brand trust only
-            elif has_brand and not has_bis:
-                st.markdown(
-                    "**Decision:** ⚠️ Incomplete information\n\n"
-                    "**Reason:** Brand name alone does not guarantee safety.\n\n"
-                    "**Action:** Verify BIS mark for the specific product model."
-                )
-
-            # 5️⃣ General safety doubt
-            elif has_safe:
-                st.markdown(
-                    "**Decision:** ⚠️ Depends on certification\n\n"
-                    "**Reason:** Product safety depends on BIS compliance and realistic claims.\n\n"
-                    "**Action:** Check BIS mark and avoid unrealistic promises."
-                )
-
-            # 6️⃣ Complaint guidance
-            elif has_complain:
-                st.markdown(
-                    "**Action:** 📢 File a complaint\n\n"
-                    "**When:** Fake BIS mark, unsafe product behavior, misleading claims.\n\n"
-                    "**Official portal:** https://consumerapp.bis.gov.in"
-                )
-
-            # 7️⃣ BIS explanation
-            elif has_bis:
-                st.markdown(
-                    "**What is BIS?**\n\n"
-                    "BIS (Bureau of Indian Standards) ensures minimum safety and quality "
-                    "standards for certain products in India.\n\n"
-                    "**Why it matters:** It protects consumers from unsafe products."
-                )
-
-            # 8️⃣ Cheap products
-            elif has_cheap:
-                st.markdown(
-                    "**Decision:** ⚠️ Higher risk\n\n"
-                    "**Reason:** Extremely low prices may compromise safety.\n\n"
-                    "**Action:** Verify BIS certification carefully."
-                )
-
-            # 9️⃣ Intelligent fallback
-            else:
-                st.markdown(
-                    "**Guidance:**\n\n"
-                    "I need more information to guide you correctly.\n\n"
-                    "Please mention:\n"
-                    "• Product type\n"
-                    "• Brand name\n"
-                    "• Whether BIS mark is present\n\n"
-                    "_Consumer safety decisions should not be guessed._"
-                )
 # ==================================================
 # COMPLAINT CENTRE
 # ==================================================
@@ -570,6 +561,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
