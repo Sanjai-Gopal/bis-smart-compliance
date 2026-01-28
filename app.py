@@ -192,7 +192,6 @@ elif st.session_state.page == "safety":
             category = "General Product"
             risk = "LOW"
 
-            # ---------- CATEGORY DETECTION ----------
             if any(k in t for k in ["charger", "heater", "iron", "adapter", "electric"]):
                 category = "Electrical Product"
                 risk = "MEDIUM"
@@ -208,7 +207,6 @@ elif st.session_state.page == "safety":
                     risk = "MEDIUM"
                 reasons.append("Products used near water need additional safety protection.")
 
-            # ---------- CLAIM CHECK ----------
             if any(k in t for k in ["eco", "green", "environment"]):
                 reasons.append("Eco-friendly is a marketing term, not a BIS certification.")
 
@@ -221,7 +219,6 @@ elif st.session_state.page == "safety":
                     risk = "MEDIUM"
                 reasons.append("No BIS reference found on the product description.")
 
-            # ---------- FINAL OUTPUT ----------
             if risk == "LOW":
                 status = "🟢 Low Risk – Generally Safe"
                 confidence = "High"
@@ -249,39 +246,18 @@ elif st.session_state.page == "safety":
                 """,
                 unsafe_allow_html=True
             )
-            st.markdown("### 🔍 Brand Confidence Indicator")
-
-if decision.startswith("✅"):
-    st.write("🟢 Widely trusted brand (model verification required)")
-elif decision.startswith("⚠️"):
-    st.write("🟡 Limited public information available")
-else:
-    st.write("🔴 Consumer caution advised")
-
-            st.markdown("### 🧠 Why this matters for consumers")
-st.write(
-    "Misleading safety claims can cause electric shock, fire accidents, or child injury. "
-    "This platform helps consumers make safer decisions before purchase."
-)
-st.markdown("### 📜 BIS Safety Reference (Awareness)")
-st.write(
-    "• Electrical products: IS 13252\n"
-    "• Waterproof claims: IS 60529\n"
-    "• Child safety products: IS 9873\n\n"
-    "These references are for consumer awareness only."
-)
-st.markdown("### 👉 Recommended Next Step")
-
-if confidence == "High":
-    st.success("You may proceed, but still verify the BIS mark physically.")
-elif confidence == "Medium":
-    st.warning("Please verify the BIS license number before purchase.")
-else:
-    st.error("Avoid this product and consider reporting misleading claims.")
 
             st.markdown("### 📌 Why this result?")
             for r in reasons:
                 st.write("•", r)
+
+            st.markdown("### 👉 Recommended Next Step")
+            if confidence == "High":
+                st.success("You may proceed, but still verify the BIS mark physically.")
+            elif confidence == "Medium":
+                st.warning("Verify BIS license number before purchase.")
+            else:
+                st.error("Avoid this product and consider reporting misleading claims.")
 
             st.info(
                 "This result provides consumer awareness guidance only. "
@@ -593,6 +569,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
