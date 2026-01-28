@@ -200,7 +200,8 @@ elif st.session_state.page == "safety":
             st.markdown(
                 f"<div class='{style}'>"
                 f"<b>Product Category:</b> {category}<br>"
-                f"# ---------- SAFETY STATUS (INSTEAD OF SCORE) ----------
+                f"
+                # ---------- SAFETY STATUS (INSTEAD OF SCORE) ----------
 if risk_score <= 25:
     safety_status = "🟢 Low Risk – Generally Safe"
     confidence = "High"
@@ -544,6 +545,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
