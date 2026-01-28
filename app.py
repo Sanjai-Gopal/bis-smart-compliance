@@ -305,98 +305,129 @@ elif st.session_state.page == "safety":
 # ==================================================
 # BRAND CHECK
 # ==================================================
+# ==================================================
+# BRAND CHECK (UPGRADED – NO SCORE, REAL COMPLIANCE LOGIC)
+# ==================================================
 elif st.session_state.page == "brand":
-    st.header("🏷️ Brand Verification")
+    st.header("🏷️ Brand & Model Compliance Check")
 
-    brand = st.text_input("Enter brand name (example: Havells, Philips, MI)")
-    model = st.text_input("Enter model number (optional)")
+    brand = st.text_input("Enter Brand Name (example: Samsung, Havells, Philips)")
+    model = st.text_input("Enter Model Number (optional)")
     product_type = st.selectbox(
-        "Select product type (optional)",
-        ["Not sure", "Electrical appliance", "Electronic gadget", "Child product", "Kitchen appliance", "Other"]
+        "Select Product Type (optional)",
+        [
+            "Not sure",
+            "Electrical appliance",
+            "Electronic accessory (charger, adapter)",
+            "Child product / Toy",
+            "Kitchen appliance",
+            "Other"
+        ]
     )
 
-    if st.button("Verify Brand"):
-        if not brand or not brand.strip():
+    if st.button("Check Compliance"):
+        if not brand.strip():
             st.warning("Please enter a brand name.")
         else:
             b = brand.lower().strip()
 
-            reasons = []
-            trust_score = 50  # neutral baseline
-
-            # ---------- BRAND CATEGORY ----------
+            # ================= BRAND RECOGNITION =================
             if b in APPROVED_BRANDS:
-                trust_score += 30
-                reasons.append("Brand is widely known and commonly BIS-compliant.")
+                brand_status = "🟢 Widely recognized Indian brand"
+                brand_note = (
+                    "This brand is commonly found in BIS-certified products. "
+                    "However, certification depends on the specific model."
+                )
+                style = "ok"
 
             elif b in DISAPPROVED_BRANDS:
-                trust_score -= 40
-                reasons.append("Brand has been associated with misleading or unsafe claims.")
-
-            else:
-                trust_score -= 10
-                reasons.append("Brand is not found in common consumer registry.")
-
-            # ---------- PRODUCT TYPE RISK ----------
-            if product_type == "Electrical appliance":
-                trust_score -= 5
-                reasons.append("Electrical products require strict BIS safety compliance.")
-
-            if product_type == "Child product":
-                trust_score -= 10
-                reasons.append("Child products require higher safety standards.")
-
-            # ---------- MODEL INFORMATION ----------
-            if model.strip():
-                reasons.append("Model number provided — BIS certification must be verified for this exact model.")
-            else:
-                trust_score -= 5
-                reasons.append("No model number provided, verification is incomplete.")
-
-            # ---------- SCORE NORMALIZATION ----------
-            if trust_score > 100:
-                trust_score = 100
-            if trust_score < 0:
-                trust_score = 0
-
-            # ---------- FINAL DECISION ----------
-            if trust_score >= 70:
-                decision = "✅ Trusted brand (verify model certification)"
-                style = "ok"
-            elif trust_score >= 40:
-                decision = "⚠️ Use with caution"
-                style = "warn"
-            else:
-                decision = "❌ Not recommended"
+                brand_status = "🔴 Brand associated with misleading or unsafe claims"
+                brand_note = (
+                    "This brand has been reported for unsafe or misleading practices. "
+                    "Extra caution is strongly advised."
+                )
                 style = "bad"
 
-            # ---------- DISPLAY RESULT ----------
-            st.subheader("📋 Brand Trust Assessment")
+            else:
+                brand_status = "🟡 Brand not found in common consumer registry"
+                brand_note = (
+                    "This brand may be new or less documented. "
+                    "Verification is required before purchase."
+                )
+                style = "warn"
 
+            # ================= PRODUCT TYPE → BIS STANDARD =================
+            if product_type == "Electrical appliance":
+                bis_rule = "IS 13252 – Electrical safety standard"
+                risk_note = "Risk of electric shock or fire if uncertified."
+
+            elif product_type == "Electronic accessory (charger, adapter)":
+                bis_rule = "IS 13252 – Safety of power adapters & chargers"
+                risk_note = "Overheating and shock risk if uncertified."
+
+            elif product_type == "Child product / Toy":
+                bis_rule = "IS 9873 – Safety requirements for toys"
+                risk_note = "High safety requirement due to child usage."
+
+            elif product_type == "Kitchen appliance":
+                bis_rule = "IS 302 – Safety of household appliances"
+                risk_note = "Fire and electrical risk if standards are not met."
+
+            else:
+                bis_rule = "Applicable BIS standard depends on product category"
+                risk_note = "Exact safety rule must be confirmed."
+
+            # ================= MODEL INSIGHT =================
+            if model.strip():
+                model_note = (
+                    f"The model you entered ({model}) must have its **own BIS CM/L license**.\n\n"
+                    "Important:\n"
+                    "• BIS certification is issued per product model\n"
+                    "• Brand name alone does not guarantee safety\n"
+                    "• Always check BIS mark and license number on the product"
+                )
+            else:
+                model_note = (
+                    "No model number provided.\n\n"
+                    "For accurate verification:\n"
+                    "• Check the exact model printed on the product\n"
+                    "• BIS certification is model-specific"
+                )
+
+            # ================= FINAL CONSUMER GUIDANCE =================
+            if b in DISAPPROVED_BRANDS:
+                final_guidance = "❌ Avoid purchasing this product."
+            elif b in APPROVED_BRANDS:
+                final_guidance = "⚠️ You may consider this brand, but verify the model’s BIS license."
+            else:
+                final_guidance = "⚠️ Proceed only after careful BIS verification."
+
+            # ================= DISPLAY RESULT =================
             st.markdown(
-                f"<div class='{style}'>"
-                f"<b>Brand:</b> {brand.title()}<br>"
-                f"<b>Trust Score:</b> {trust_score} / 100<br>"
-                f"<b>Final Recommendation:</b> {decision}"
-                f"</div>",
+                f"""
+                <div class="{style}">
+                <b>Brand Recognition:</b> {brand_status}<br><br>
+
+                <b>Brand Insight:</b><br>
+                {brand_note}<br><br>
+
+                <b>Detected Product Type:</b> {product_type}<br>
+                <b>Applicable BIS Safety Rule:</b> {bis_rule}<br>
+                <b>Consumer Risk:</b> {risk_note}<br><br>
+
+                <b>Model-Level Insight:</b><br>
+                {model_note}<br><br>
+
+                <b>Final Consumer Guidance:</b><br>
+                {final_guidance}
+                </div>
+                """,
                 unsafe_allow_html=True
             )
 
-            # ---------- EXPLANATION ----------
-            st.markdown("### 📌 Why this decision?")
-            for r in reasons:
-                st.write("•", r)
-
-            # ---------- CONSUMER GUIDANCE ----------
-            st.markdown("### 🛡️ What you should do next")
-            st.write("• Check BIS mark and CM/L license number on the product")
-            st.write("• Verify manufacturer name and address")
-            st.write("• Ensure certification matches the exact model")
-            st.write("• Avoid brands making unrealistic safety claims")
-
             st.info(
-                "This brand check provides awareness guidance only. "
-                "BIS certification is product- and model-specific."
+                "This result provides consumer awareness guidance only. "
+                "Final confirmation must be done using the official BIS license database."
             )
 # ==================================================
 # AI ASSISTANT (SAFE FALLBACK)
@@ -688,6 +719,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
