@@ -260,17 +260,39 @@ elif st.session_state.page == "safety":
             style = "bad"
 
         # ================= DISPLAY RESULT =================
-        st.markdown(
-            f"""
-            <div class="{style}">
-            <b>Product Category:</b> {category}<br>
-            <b>Safety Status:</b> {status}<br>
-            <b>Confidence Level:</b> {confidence}<br>
-            <b>Final Recommendation:</b> {recommendation}
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
+   st.markdown(
+    f"""
+    <div class="{style}">
+        <h4>🔍 Brand Recognition</h4>
+        <p><b>{brand_status}</b></p>
+
+        <hr style="opacity:0.3">
+
+        <p><b>Brand Insight</b><br>
+        {brand_note}</p>
+
+        <p><b>Detected Product Type</b><br>
+        {product_type}</p>
+
+        <p><b>Applicable BIS Safety Rule</b><br>
+        {bis_rule}</p>
+
+        <p><b>Consumer Risk</b><br>
+        {risk_note}</p>
+
+        <hr style="opacity:0.3">
+
+        <p><b>Model-Level Insight</b><br>
+        {model_note.replace(chr(10), "<br>")}</p>
+
+        <hr style="opacity:0.3">
+
+        <p><b>Final Consumer Guidance</b><br>
+        {final_guidance}</p>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
         # ================= EXPLANATION =================
         st.markdown("### 📌 Why this result?")
@@ -719,6 +741,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
