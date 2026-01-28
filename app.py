@@ -173,11 +173,19 @@ if st.session_state.page == "home":
 # ==================================================
 # PRODUCT SAFETY CHECK
 # ==================================================
+# ==================================================
+# PRODUCT SAFETY CHECK (FINAL – SMART & BIS-ALIGNED)
+# ==================================================
 elif st.session_state.page == "safety":
     st.header("🔍 Product Safety Check")
 
+    st.caption(
+        "Enter what is written on the product, box, or online description. "
+        "Simple English is enough."
+    )
+
     text = st.text_area(
-        "Write what is written on the product or packaging (simple English is enough)"
+        "Example: child safe toy, eco friendly charger, waterproof speaker"
     )
 
     if st.button("Analyze Safety"):
@@ -185,132 +193,119 @@ elif st.session_state.page == "safety":
             st.warning("Please enter product information.")
             st.stop()
 
-        t = text.lower()
+        t = text.lower().strip()
 
-        # ================= INITIAL STATE =================
-        category = "General Product"
-        risk_level = "LOW"
+        # ================= DEFAULT STATE =================
+        category = "General Consumer Product"
+        safety_status = "🟢 Generally Safe"
         confidence = "High"
+        recommendation = "Safe to use after basic verification"
+        style = "ok"
+
         reasons = []
-        recommendations = []
+        bis_references = []
 
-        # ================= PRODUCT CATEGORY =================
-        if any(k in t for k in ["toy", "baby", "child", "kids"]):
-            category = "Child-related Product"
-            risk_level = "MEDIUM"
-            confidence = "Medium"
-            reasons.append(
-                "Products used by children must comply with BIS child safety standards (IS 9873)."
-            )
-
-        if any(k in t for k in ["charger", "heater", "iron", "electric", "adapter"]):
+        # ================= PRODUCT CATEGORY DETECTION =================
+        if any(k in t for k in ["charger", "adapter", "heater", "iron", "electric"]):
             category = "Electrical Product"
-            if risk_level != "HIGH":
-                risk_level = "MEDIUM"
+            safety_status = "🟡 Needs Verification"
             confidence = "Medium"
+            recommendation = "Use with caution"
+            style = "warn"
             reasons.append(
-                "Electrical products require BIS electrical safety compliance (IS 13252)."
+                "Electrical products may cause shock or fire if not certified."
             )
+            bis_references.append("IS 13252 – Electrical safety standard")
 
-        if any(k in t for k in ["waterproof", "water", "bath", "geyser"]):
-            if risk_level != "HIGH":
-                risk_level = "MEDIUM"
+        if any(k in t for k in ["toy", "child", "baby", "kids"]):
+            category = "Child-related Product"
+            safety_status = "🟡 Needs Verification"
+            confidence = "Medium"
+            recommendation = "Use only after verification"
+            style = "warn"
             reasons.append(
-                "Water-related usage requires certified IP protection (IS 60529)."
+                "Products used by children require strict safety compliance."
             )
+            bis_references.append("IS 9873 – Safety of toys and child products")
+
+        if any(k in t for k in ["waterproof", "water resistant", "ip rating"]):
+            safety_status = "🟡 Needs Verification"
+            confidence = "Medium"
+            recommendation = "Verify waterproof certification before use"
+            style = "warn"
+            reasons.append(
+                "Waterproof claims must be supported by certified IP ratings."
+            )
+            bis_references.append("IS 60529 – IP protection standards")
 
         # ================= CLAIM ANALYSIS =================
-        if any(k in t for k in ["eco", "green", "environment"]):
+        if any(k in t for k in ["eco", "green", "environment friendly"]):
             reasons.append(
-                "‘Eco-friendly’ is a marketing term and is not defined under BIS standards."
+                "‘Eco-friendly’ is a marketing term and not defined under BIS certification."
             )
 
         if any(k in t for k in ["100% safe", "explosion proof", "unbreakable"]):
-            risk_level = "HIGH"
+            safety_status = "🔴 High Risk"
             confidence = "Low"
+            recommendation = "Not recommended until verified"
+            style = "bad"
             reasons.append(
-                "Unrealistic safety claims are considered misleading and unsafe."
+                "Unrealistic safety claims are misleading and unsafe."
             )
 
-        # ================= BIS CHECK =================
+        # ================= BIS MARK CHECK =================
         if "bis" not in t:
-            if risk_level == "LOW":
-                risk_level = "MEDIUM"
+            if safety_status == "🟢 Generally Safe":
+                safety_status = "🟡 Needs Verification"
                 confidence = "Medium"
+                recommendation = "Verify BIS mark before use"
+                style = "warn"
             reasons.append(
                 "No BIS mark or license reference mentioned in the product description."
             )
         else:
             reasons.append(
-                "BIS claim detected. Always verify CM/L license number on the product."
+                "BIS claim detected. Verify the CM/L license number on the product."
             )
 
-        # ================= FINAL DECISION =================
-        if risk_level == "LOW":
-            status = "🟢 Generally Safe"
-            recommendation = "Safe to use with basic verification"
-            style = "ok"
-        elif risk_level == "MEDIUM":
-            status = "🟡 Needs Verification"
-            recommendation = "Use with caution"
-            style = "warn"
-        else:
-            status = "🔴 High Risk"
-            recommendation = "Not recommended until verified"
-            style = "bad"
-
         # ================= DISPLAY RESULT =================
-   st.markdown(
-    f"""
-    <div class="{style}">
-        <h4>🔍 Brand Recognition</h4>
-        <p><b>{brand_status}</b></p>
+        st.markdown(
+            f"""
+            <div class="{style}">
+            <h3>Safety Assessment Result</h3>
 
-        <hr style="opacity:0.3">
+            <b>Detected Product Category:</b> {category}<br><br>
 
-        <p><b>Brand Insight</b><br>
-        {brand_note}</p>
+            <b>Safety Status:</b> {safety_status}<br>
+            <b>Confidence Level:</b> {confidence}<br><br>
 
-        <p><b>Detected Product Type</b><br>
-        {product_type}</p>
-
-        <p><b>Applicable BIS Safety Rule</b><br>
-        {bis_rule}</p>
-
-        <p><b>Consumer Risk</b><br>
-        {risk_note}</p>
-
-        <hr style="opacity:0.3">
-
-        <p><b>Model-Level Insight</b><br>
-        {model_note.replace(chr(10), "<br>")}</p>
-
-        <hr style="opacity:0.3">
-
-        <p><b>Final Consumer Guidance</b><br>
-        {final_guidance}</p>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+            <b>Final Recommendation:</b><br>
+            {recommendation}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
         # ================= EXPLANATION =================
-        st.markdown("### 📌 Why this result?")
-        for r in reasons:
-            st.write("•", r)
+        if reasons:
+            st.markdown("### 📌 Why this result?")
+            for r in reasons:
+                st.write("•", r)
 
-        # ================= SMART CONSUMER BENEFITS (10+) =================
-        st.markdown("### 🛡️ Consumer Safety Benefits")
-        st.write("✔ Prevents misleading safety claims")
+        # ================= BIS REFERENCES =================
+        if bis_references:
+            st.markdown("### 📜 Relevant BIS Safety References (Awareness)")
+            for ref in set(bis_references):
+                st.write("•", ref)
+
+        # ================= CONSUMER BENEFITS =================
+        st.markdown("### 🛡️ How this helps consumers")
+        st.write("✔ Avoids misleading safety claims")
         st.write("✔ Encourages BIS verification before purchase")
-        st.write("✔ Protects children from unsafe products")
-        st.write("✔ Reduces risk of electric shock or fire")
-        st.write("✔ Improves consumer awareness")
-        st.write("✔ Supports informed buying decisions")
-        st.write("✔ Highlights fake or exaggerated claims")
-        st.write("✔ Guides even users with basic English")
-        st.write("✔ Promotes legal compliance")
-        st.write("✔ Helps avoid unsafe low-quality products")
+        st.write("✔ Protects children and families")
+        st.write("✔ Reduces risk of electrical accidents")
+        st.write("✔ Helps users with simple English understand safety")
+        st.write("✔ Promotes informed buying decisions")
 
         # ================= NEXT STEPS =================
         st.markdown("### 👉 Recommended Next Steps")
@@ -320,13 +315,9 @@ elif st.session_state.page == "safety":
         st.write("• Report suspicious products to BIS if needed")
 
         st.info(
-            "This result provides consumer awareness guidance only. "
+            "This safety assessment provides consumer awareness guidance only. "
             "Final safety confirmation must be done through official BIS verification."
         )
-
-# ==================================================
-# BRAND CHECK
-# ==================================================
 # ==================================================
 # BRAND CHECK (FINAL – COMPLIANCE BASED, NO SCORE)
 # ==================================================
@@ -772,6 +763,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
