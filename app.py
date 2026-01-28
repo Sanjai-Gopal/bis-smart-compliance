@@ -200,7 +200,30 @@ elif st.session_state.page == "safety":
             st.markdown(
                 f"<div class='{style}'>"
                 f"<b>Product Category:</b> {category}<br>"
-                f"<b>Risk Score:</b> {risk_score} / 100<br>"
+                f"# ---------- SAFETY STATUS (INSTEAD OF SCORE) ----------
+if risk_score <= 25:
+    safety_status = "🟢 Low Risk – Generally Safe"
+    confidence = "High"
+    style = "ok"
+elif risk_score <= 60:
+    safety_status = "🟡 Moderate Risk – Needs Verification"
+    confidence = "Medium"
+    style = "warn"
+else:
+    safety_status = "🔴 High Risk – Avoid Use"
+    confidence = "Low"
+    style = "bad"
+
+st.markdown(
+    f"<div class='{style}'>"
+    f"<b>Product Category:</b> {category}<br>"
+    f"<b>Safety Status:</b> {safety_status}<br>"
+    f"<b>Safety Confidence:</b> {confidence}<br>"
+    f"<b>Final Recommendation:</b> {decision}"
+    f"</div>",
+    unsafe_allow_html=True
+)
+"
                 f"<b>Final Recommendation:</b> {decision}"
                 f"</div>",
                 unsafe_allow_html=True
@@ -521,6 +544,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
