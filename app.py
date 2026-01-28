@@ -56,12 +56,13 @@ body { background-color:#0b1220; }
   opacity:0.7;
   font-size:14px;
 }
-</style>
-""", unsafe_allow_html=True)
 .card:hover {
   transform: scale(1.01);
   transition: transform 0.3s ease;
 }
+
+</style>
+""", unsafe_allow_html=True)
 
 
 # ==================================================
@@ -546,6 +547,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
