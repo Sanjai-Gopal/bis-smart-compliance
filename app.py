@@ -466,6 +466,7 @@ elif st.session_state.page == "assistant":
                 "_Consumer safety decisions should not be guessed._"
             )
 
+
 # ==================================================
 # COMPLAINT CENTRE
 # ==================================================
@@ -561,6 +562,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
