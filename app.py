@@ -671,6 +671,9 @@ elif st.session_state.page == "assistant":
 # ==================================================
 # COMPLAINT CENTRE
 # ==================================================
+# ==================================================
+# COMPLAINT CENTRE (FINAL – OFFICIAL & USER-TRUSTED)
+# ==================================================
 elif st.session_state.page == "complaint":
     st.header("📢 BIS Consumer Complaint Centre")
 
@@ -678,40 +681,52 @@ elif st.session_state.page == "complaint":
         """
         <div class="card">
         <h3>When should you file a complaint?</h3>
+
         <ul>
-            <li>Product shows a <b>fake or unclear BIS mark</b></li>
+            <li>Product shows a <b>fake, unclear, or missing BIS mark</b></li>
             <li>Electrical product <b>overheats, sparks, shocks, or smells</b></li>
-            <li>Product makes <b>unrealistic claims</b> like “100% safe” or “explosion proof”</li>
-            <li>No <b>manufacturer name, address, or license number</b></li>
-            <li>Product quality looks unsafe or misleading</li>
+            <li>Product makes <b>misleading claims</b> such as “100% safe” or “explosion proof”</li>
+            <li>No <b>manufacturer name, address, or BIS license number</b></li>
+            <li>Product quality appears unsafe or suspicious</li>
         </ul>
 
         <h3>Why is filing a complaint important?</h3>
         <p>
-        Filing a complaint helps BIS identify unsafe products, take legal action,
-        protect other consumers, and improve product safety standards in India.
+        Filing a complaint helps the <b>Bureau of Indian Standards (BIS)</b>:
         </p>
+        <ul>
+            <li>Identify unsafe or illegal products</li>
+            <li>Take enforcement and legal action</li>
+            <li>Protect other consumers</li>
+            <li>Improve product safety standards in India</li>
+        </ul>
 
         <h3>Official BIS Consumer Complaint Portal</h3>
         <p>
-        Click the button below to file your complaint directly on the official BIS portal.
+        Click the button below to file your complaint directly on the
+        <b>official BIS website</b>.
         </p>
 
-        <a href="https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/?lang=en>
-            <button style="
-                background:#1e40af;
-                color:white;
-                padding:14px 22px;
-                border:none;
-                border-radius:12px;
-                font-size:16px;
-                cursor:pointer;
-            ">
-                🚨 Go to Official BIS Complaint Portal
-            </button>
-        </a>
+        <div style="margin-top:18px;">
+            <a href="https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/?lang=en"
+               target="_blank"
+               style="text-decoration:none;">
+                <button style="
+                    background: linear-gradient(135deg, #1e40af, #2563eb);
+                    color: white;
+                    padding: 14px 26px;
+                    border: none;
+                    border-radius: 14px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                ">
+                    🚨 Go to Official BIS Complaint Portal
+                </button>
+            </a>
+        </div>
 
-        <p style="margin-top:12px; opacity:0.8;">
+        <p style="margin-top:14px; opacity:0.8;">
         This portal is managed by the <b>Bureau of Indian Standards (Government of India)</b>.
         </p>
         </div>
@@ -720,8 +735,8 @@ elif st.session_state.page == "complaint":
     )
 
     st.info(
-        "Note: This platform does not collect complaints or personal data. "
-        "All complaints are handled only through the official BIS system."
+        "Important: This platform does not collect complaints or personal data. "
+        "All complaints must be submitted only through the official BIS portal."
     )
 # ==================================================
 # FEEDBACK (MUST-HAVE)
@@ -763,6 +778,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
