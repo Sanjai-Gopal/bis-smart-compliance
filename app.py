@@ -372,11 +372,12 @@ elif st.session_state.page == "assistant":
 
     if st.button("Get Answer"):
     if len(q.split()) < 3:
-    st.info(
-        "Could you please add more details? "
-        "For example: product type or brand name."
-    )
-    st.stop()
+        st.info(
+            "Could you please add more details? "
+            "For example: product type or brand name."
+        )
+        st.stop()
+
 
         if not q or not q.strip():
             st.warning("Please type a question.")
@@ -569,6 +570,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
