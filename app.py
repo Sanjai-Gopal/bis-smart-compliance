@@ -789,7 +789,7 @@ elif st.session_state.page == "complaint":
         </p>
 
         <div style="margin-top:18px;">
-            <a href="https://www.bis.gov.in/consumer-overview/consumer-overviews/citizen-charter/?lang=en"
+            <a href="https://www.bis.gov.in/system-certification-overview/public-grievance/complaints/?lang=en"
                target="_blank"
                style="text-decoration:none;">
                 <button style="
@@ -906,6 +906,7 @@ elif st.session_state.page == "feedback":
 # ==================================================
 st.divider()
 st.caption("Educational & awareness platform only. Not official BIS system.")
+
 
 
 
