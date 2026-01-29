@@ -757,10 +757,12 @@ elif st.session_state.page == "assistant":
 # ==================================================
 elif st.session_state.page == "complaint":
     st.header("📢 BIS Consumer Complaint Centre")
-
-    st.markdown(
-        """
-        <div class="card">
+st.markdown(
+    """
+    <div class="card">
+    """,
+    unsafe_allow_html=True
+)
         <h3>When should you file a complaint?</h3>
 
         <ul>
@@ -906,6 +908,7 @@ elif st.session_state.page == "feedback":
 # ==================================================
 st.divider()
 st.caption("Educational & awareness platform only. Not official BIS system.")
+
 
 
 
