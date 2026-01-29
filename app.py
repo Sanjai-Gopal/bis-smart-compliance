@@ -58,6 +58,14 @@ APPROVED_BRANDS = {
     "prestige","pigeon","cello","milton","tata","wipro"
 }
 
+    # DEMO VERIFIED MODELS (FOR AWARENESS PURPOSES)
+APPROVED_MODELS = {
+    "samsung": {"ep-ta800", "ep-ta200","s24","m35"},
+    "philips": {"gc1905", "hl7756"},
+    "lg": {"43lm5600", "32lm560b"},
+    "havells": {"andria75w", "stealthair"},
+}
+
 DISAPPROVED_BRANDS = {"quickcharge pro","powermax","supervolt","cheapmax"}
 
 # ==================================================
@@ -838,6 +846,7 @@ elif st.session_state.page == "feedback":
 # ==================================================
 st.divider()
 st.caption("Educational & awareness platform only. Not official BIS system.")
+
 
 
 
