@@ -285,6 +285,92 @@ elif st.session_state.page == "safety":
             """,
             unsafe_allow_html=True
         )
+        # ==================================================
+# 🔍 EXPLAINABILITY PANEL (WHY THIS RESULT)
+# ==================================================
+with st.expander("🔎 How did the system decide this?"):
+    st.markdown("### Decision Factors Identified")
+    for r in reasons:
+        st.write("•", r)
+
+    st.markdown("### Decision Logic")
+    st.write(
+        "The system analyzes product claims, usage context, "
+        "and BIS safety expectations to provide consumer guidance."
+    )
+
+# ==================================================
+# ⚠️ RISK SIMULATION – WHAT COULD GO WRONG
+# ==================================================
+st.markdown("### ⚠️ What could go wrong if this product is unsafe?")
+
+risk_map = []
+
+if category == "Electrical Product":
+    risk_map.extend([
+        "⚡ Electric shock during use",
+        "🔥 Fire hazard due to overheating",
+        "🔌 Damage to home wiring"
+    ])
+
+if category == "Child Product":
+    risk_map.extend([
+        "🧸 Choking or injury risk for children",
+        "☠️ Exposure to unsafe materials",
+        "⚠️ Serious safety violation under BIS rules"
+    ])
+
+if any("eco" in r.lower() for r in reasons):
+    risk_map.append("❗ Misleading eco-friendly claims may hide safety risks")
+
+if risk_map:
+    for r in risk_map:
+        st.write("•", r)
+else:
+    st.write("• No immediate high-risk scenario detected")
+
+# ==================================================
+# 📜 BIS RULE MAP (AUTO-MAPPED)
+# ==================================================
+st.markdown("### 📜 Applicable BIS Safety Standards (Awareness)")
+
+bis_rules = {
+    "Electrical Product": ("IS 13252", "Electrical & electronic safety"),
+    "Child Product": ("IS 9873", "Mechanical & material safety for toys"),
+    "Kitchen Appliance": ("IS 302", "Household electrical appliance safety"),
+    "General Product": ("Category-based", "Depends on exact product type")
+}
+
+rule, purpose = bis_rules.get(category, ("Not specified", "Requires verification"))
+
+st.info(
+    f"""
+    **BIS Standard:** {rule}  
+    **Purpose:** {purpose}  
+
+    BIS certification is mandatory for many products sold in India.
+    """
+)
+
+# ==================================================
+# 🧭 FINAL SMART NEXT STEP (AUTO-GUIDED)
+# ==================================================
+st.markdown("### 🧭 Recommended Next Step")
+
+if confidence == "High":
+    st.success(
+        "You may proceed with this product, but always verify the BIS mark and license number physically."
+    )
+
+elif confidence == "Medium":
+    st.warning(
+        "Before buying, check the BIS CM/L license number on the product or packaging."
+    )
+
+else:
+    st.error(
+        "Avoid using this product. Consider reporting misleading or unsafe claims to BIS."
+    )
 
         # ================= EXPLANATION =================
         if reasons:
@@ -778,6 +864,7 @@ st.markdown("""
 Educational & awareness platform only. Not an official BIS system.
 </div>
 """, unsafe_allow_html=True)
+
 
 
 
