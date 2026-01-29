@@ -755,43 +755,44 @@ elif st.session_state.page == "assistant":
 # ==================================================
 # COMPLAINT
 # ==================================================
+# ==================================================
+# COMPLAINT CENTRE (FINAL – OFFICIAL, ADVANCED, ERROR-FREE)
+# ==================================================
 elif st.session_state.page == "complaint":
     st.header("📢 BIS Consumer Complaint Centre")
-st.markdown(
-    """
-    <div class="card">
-    """,
-    unsafe_allow_html=True
-)
-        <h3>When should you file a complaint?</h3>
 
+    st.markdown(
+        """
+        <div class="card">
+
+        <h3>📌 When should you file a complaint?</h3>
         <ul>
-            <li>Product has a <b>fake, unclear, or missing BIS mark</b></li>
+            <li>Product shows a <b>fake, unclear, or missing BIS mark</b></li>
             <li>Electrical product <b>overheats, sparks, shocks, or smells</b></li>
-            <li>Product claims <b>“100% safe”, “explosion proof”, or similar</b></li>
+            <li>Product makes <b>misleading claims</b> like “100% safe” or “explosion proof”</li>
             <li>No <b>manufacturer name, address, or BIS license number</b></li>
-            <li>Product quality appears unsafe or misleading</li>
+            <li>Product quality appears unsafe, cheap, or suspicious</li>
         </ul>
 
-        <h3>Why is filing a complaint important?</h3>
+        <h3>⚖️ Why is filing a complaint important?</h3>
         <p>
-        Filing a complaint helps the <b>Bureau of Indian Standards (BIS)</b>:
+        Filing a complaint helps the <b>Bureau of Indian Standards (BIS)</b> to:
         </p>
         <ul>
-            <li>Identify unsafe and illegal products</li>
-            <li>Take legal and enforcement action</li>
-            <li>Protect other consumers</li>
-            <li>Improve safety standards across India</li>
+            <li>Identify unsafe or illegal products</li>
+            <li>Take enforcement and legal action</li>
+            <li>Protect other consumers across India</li>
+            <li>Improve national product safety standards</li>
         </ul>
 
-        <h3>Official BIS Consumer Complaint Portal</h3>
+        <h3>🔗 Official BIS Consumer Complaint Portal</h3>
         <p>
-        Click the button below to file your complaint directly on the
-        <b>official Government of India BIS portal</b>.
+        Click the button below to submit your complaint directly on the
+        <b>official BIS website</b>.
         </p>
 
         <div style="margin-top:18px;">
-            <a href="https://www.bis.gov.in/system-certification-overview/public-grievance/complaints/?lang=en"
+            <a href="https://www.bis.gov.in/consumer-overview/consumer-overviews/online-complaint-registration/?lang=en"
                target="_blank"
                style="text-decoration:none;">
                 <button style="
@@ -809,19 +810,19 @@ st.markdown(
             </a>
         </div>
 
-        <p style="margin-top:14px; opacity:0.8;">
-        This portal is operated by the <b>Bureau of Indian Standards (Government of India)</b>.
+        <p style="margin-top:16px; opacity:0.85;">
+        This portal is managed by the <b>Bureau of Indian Standards (Government of India)</b>.
         </p>
+
         </div>
         """,
         unsafe_allow_html=True
     )
 
     st.info(
-        "Important: This platform does not collect complaints or personal data. "
-        "All complaints must be submitted directly on the official BIS website."
+        "ℹ️ This platform does NOT collect complaints or personal data. "
+        "All complaints must be submitted only through the official BIS portal."
     )
-
 # ==================================================
 # FEEDBACK
 # ==================================================
@@ -908,6 +909,7 @@ elif st.session_state.page == "feedback":
 # ==================================================
 st.divider()
 st.caption("Educational & awareness platform only. Not official BIS system.")
+
 
 
 
