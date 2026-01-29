@@ -823,75 +823,89 @@ elif st.session_state.page == "complaint":
 # ==================================================
 # FEEDBACK
 # ==================================================
-elif st.session_state.page == "complaint":
-    st.header("📢 BIS Consumer Complaint Centre")
+elif st.session_state.page == "feedback":
+    st.header("📝 Consumer Experience & Feedback")
 
     st.markdown(
         """
         <div class="card">
-        <h3>When should you file a complaint?</h3>
-
-        <ul>
-            <li>Product has a <b>fake, unclear, or missing BIS mark</b></li>
-            <li>Electrical product <b>overheats, sparks, shocks, or smells</b></li>
-            <li>Product claims <b>“100% safe”, “explosion proof”, or similar</b></li>
-            <li>No <b>manufacturer name, address, or BIS license number</b></li>
-            <li>Product quality appears unsafe or misleading</li>
-        </ul>
-
-        <h3>Why is filing a complaint important?</h3>
+        <h3>Your voice helps improve consumer safety 🇮🇳</h3>
         <p>
-        Filing a complaint helps the <b>Bureau of Indian Standards (BIS)</b>:
+        This platform is built to spread <b>BIS safety awareness</b>.
+        Your feedback helps us understand:
         </p>
         <ul>
-            <li>Identify unsafe and illegal products</li>
-            <li>Take legal and enforcement action</li>
-            <li>Protect other consumers</li>
-            <li>Improve safety standards across India</li>
+            <li>✔ Was the information easy to understand?</li>
+            <li>✔ Did it help you make a safer decision?</li>
+            <li>✔ What can be improved for real consumers?</li>
         </ul>
-
-        <h3>Official BIS Consumer Complaint Portal</h3>
-        <p>
-        Click the button below to file your complaint directly on the
-        <b>official Government of India BIS portal</b>.
-        </p>
-
-        <div style="margin-top:18px;">
-            <a href="https://consumerapp.bis.gov.in"
-               target="_blank"
-               style="text-decoration:none;">
-                <button style="
-                    background: linear-gradient(135deg, #1e40af, #2563eb);
-                    color: white;
-                    padding: 14px 26px;
-                    border: none;
-                    border-radius: 14px;
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                ">
-                    🚨 Go to Official BIS Complaint Portal
-                </button>
-            </a>
-        </div>
-
-        <p style="margin-top:14px; opacity:0.8;">
-        This portal is operated by the <b>Bureau of Indian Standards (Government of India)</b>.
-        </p>
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    st.info(
-        "Important: This platform does not collect complaints or personal data. "
-        "All complaints must be submitted directly on the official BIS website."
+    col1, col2 = st.columns(2)
+
+    with col1:
+        name = st.text_input("Your Name (optional)")
+        user_type = st.selectbox(
+            "You are a:",
+            ["Consumer", "Student", "Teacher", "Engineer", "Retailer", "Other"]
+        )
+
+    with col2:
+        usefulness = st.radio(
+            "How useful was this platform?",
+            ["Very Useful ⭐⭐⭐⭐⭐", "Useful ⭐⭐⭐⭐", "Average ⭐⭐⭐", "Needs Improvement ⭐⭐"]
+        )
+        clarity = st.radio(
+            "Was the information easy to understand?",
+            ["Yes, very clear", "Mostly clear", "Somewhat confusing"]
+        )
+
+    feedback = st.text_area(
+        "Share your suggestion or experience (optional)",
+        placeholder="Example: The product safety explanation helped me understand BIS rules clearly..."
     )
 
+    improve_area = st.multiselect(
+        "Which areas should be improved?",
+        [
+            "Product Safety Check",
+            "Brand & Model Verification",
+            "AI Assistant Answers",
+            "Complaint Guidance",
+            "Design & Animations",
+            "Language Simplicity"
+        ]
+    )
+
+    if st.button("Submit Feedback"):
+        st.success("🙏 Thank you for helping improve consumer safety awareness!")
+
+        st.markdown(
+            """
+            <div class="card">
+            <h4>What happens to your feedback?</h4>
+            <ul>
+                <li>✔ Used only for improving this project</li>
+                <li>✔ No personal data is stored or shared</li>
+                <li>✔ Helps make safety information simpler for everyone</li>
+            </ul>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.caption(
+            "This is an educational project focused on consumer awareness. "
+            "Feedback is used only for academic improvement."
+        )
 # ==================================================
 # FOOTER
 # ==================================================
 st.divider()
 st.caption("Educational & awareness platform only. Not official BIS system.")
+
 
 
